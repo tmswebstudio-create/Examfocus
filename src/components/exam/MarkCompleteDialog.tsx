@@ -64,7 +64,7 @@ export function MarkCompleteDialog({ examSubject, onComplete }: MarkCompleteDial
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent/5">
+        <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white transition-colors">
           <CheckCircle2 className="mr-2 h-4 w-4" />
           Complete
         </Button>
@@ -104,7 +104,7 @@ export function MarkCompleteDialog({ examSubject, onComplete }: MarkCompleteDial
               {gained && total && parseFloat(total) > 0 ? Math.round((parseFloat(gained) / parseFloat(total)) * 100) : 0}%
             </p>
           </div>
-          <Button type="submit" className="w-full bg-accent text-white hover:bg-accent/90">Submit Results</Button>
+          <Button type="submit" className="w-full bg-primary text-white hover:bg-primary/90">Submit Results</Button>
         </form>
       </DialogContent>
     </Dialog>
