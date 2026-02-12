@@ -8,7 +8,6 @@ import { PerformanceDashboard } from "@/components/dashboard/PerformanceDashboar
 import { StudyPlanTool } from "@/components/exam/StudyPlanTool";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, History, LayoutDashboard, BrainCircuit, Trash2, Clock, Sparkles } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
@@ -122,7 +121,10 @@ export default function Home() {
                       <ExamCountdown date={nextExam.date} variant="featured" />
                    </div>
                    <div className="flex gap-3">
-                      <MarkCompleteDialog examSubject={nextExam.subject} onComplete={(s) => markCompleted(nextExam.id, s)} />
+                      <MarkCompleteDialog 
+                        examSubject={nextExam.subject} 
+                        onComplete={(g, t) => markCompleted(nextExam.id, g, t)} 
+                      />
                    </div>
                 </CardContent>
               </Card>
@@ -174,7 +176,10 @@ export default function Home() {
                       </div>
                     </CardContent>
                     <div className="p-4 bg-muted/10 flex items-center justify-between">
-                      <MarkCompleteDialog examSubject={exam.subject} onComplete={(s) => markCompleted(exam.id, s)} />
+                      <MarkCompleteDialog 
+                        examSubject={exam.subject} 
+                        onComplete={(g, t) => markCompleted(exam.id, g, t)} 
+                      />
                       <Button 
                         variant="ghost" 
                         size="icon" 
@@ -207,7 +212,8 @@ export default function Home() {
                     <tr>
                       <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Subject</th>
                       <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Date</th>
-                      <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Result</th>
+                      <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Score</th>
+                      <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Result (%)</th>
                       <th className="px-6 py-4 text-sm font-semibold text-muted-foreground text-right">Actions</th>
                     </tr>
                   </thead>
@@ -216,8 +222,11 @@ export default function Home() {
                       <tr key={exam.id} className="border-b border-border/50 last:border-none hover:bg-muted/10 transition-colors">
                         <td className="px-6 py-4 font-medium">{exam.subject}</td>
                         <td className="px-6 py-4 text-muted-foreground text-sm">{format(parseISO(exam.date), 'MMM d, yyyy')}</td>
+                        <td className="px-6 py-4 text-sm font-medium">
+                          {exam.gainedMark} / {exam.totalMark}
+                        </td>
                         <td className="px-6 py-4">
-                          <Badge className={exam.score! >= 70 ? "bg-green-100 text-green-700 hover:bg-green-100" : "bg-orange-100 text-orange-700 hover:bg-orange-100"}>
+                          <Badge className={exam.score! >= 70 ? "bg-green-100 text-green-700 hover:bg-green-100 border-none" : "bg-orange-100 text-orange-700 hover:bg-orange-100 border-none"}>
                             {exam.score}%
                           </Badge>
                         </td>
@@ -235,7 +244,7 @@ export default function Home() {
                     ))}
                     {pastExams.length === 0 && (
                       <tr>
-                        <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
+                        <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
                           No past exam records found.
                         </td>
                       </tr>
@@ -246,7 +255,7 @@ export default function Home() {
           </div>
         )}
 
-        {activeTab === 'study' && (
+        {activeTab === 'study' && (activeTab === 'study' && (
           <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500 max-w-4xl">
              <div className="flex items-center gap-3 mb-8">
                 <div className="bg-accent p-3 rounded-2xl shadow-lg shadow-accent/20">
@@ -290,7 +299,7 @@ export default function Home() {
                </Card>
              )}
           </div>
-        )}
+        ))}
       </main>
     </div>
   );

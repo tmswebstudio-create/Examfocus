@@ -8,7 +8,9 @@ export type Exam = {
   date: string; // YYYY-MM-DD
   notes?: string;
   completed: boolean;
-  score?: number;
+  score?: number; // Percentage
+  gainedMark?: number;
+  totalMark?: number;
 };
 
 const STORAGE_KEY = 'examfocus_exams';
@@ -35,7 +37,7 @@ export function useExams() {
     }
   }, [exams, isLoaded]);
 
-  const addExam = (exam: Omit<Exam, 'id' | 'completed' | 'score'>) => {
+  const addExam = (exam: Omit<Exam, 'id' | 'completed' | 'score' | 'gainedMark' | 'totalMark'>) => {
     const newExam: Exam = {
       ...exam,
       id: Math.random().toString(36).substring(2, 9),
@@ -52,8 +54,14 @@ export function useExams() {
     setExams(prev => prev.filter(e => e.id !== id));
   };
 
-  const markCompleted = (id: string, score: number) => {
-    updateExam(id, { completed: true, score });
+  const markCompleted = (id: string, gainedMark: number, totalMark: number) => {
+    const score = totalMark > 0 ? Math.round((gainedMark / totalMark) * 100) : 0;
+    updateExam(id, { 
+      completed: true, 
+      score, 
+      gainedMark, 
+      totalMark 
+    });
   };
 
   return { exams, isLoaded, addExam, updateExam, deleteExam, markCompleted };

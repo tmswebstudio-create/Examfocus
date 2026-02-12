@@ -10,30 +10,54 @@ import { useToast } from "@/hooks/use-toast";
 
 interface MarkCompleteDialogProps {
   examSubject: string;
-  onComplete: (score: number) => void;
+  onComplete: (gained: number, total: number) => void;
 }
 
 export function MarkCompleteDialog({ examSubject, onComplete }: MarkCompleteDialogProps) {
   const [open, setOpen] = useState(false);
-  const [score, setScore] = useState("");
+  const [gained, setGained] = useState("");
+  const [total, setTotal] = useState("");
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const scoreNum = parseFloat(score);
-    if (isNaN(scoreNum)) {
+    const gainedNum = parseFloat(gained);
+    const totalNum = parseFloat(total);
+
+    if (isNaN(gainedNum) || isNaN(totalNum)) {
       toast({
-        title: "Invalid score",
-        description: "Please enter a valid numerical score.",
+        title: "Invalid input",
+        description: "Please enter valid numerical marks.",
         variant: "destructive"
       });
       return;
     }
-    onComplete(scoreNum);
+
+    if (totalNum <= 0) {
+      toast({
+        title: "Invalid total marks",
+        description: "Total marks must be greater than zero.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (gainedNum > totalNum) {
+      toast({
+        title: "Wait a second",
+        description: "Gained marks cannot exceed total marks.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    onComplete(gainedNum, totalNum);
     setOpen(false);
+    setGained("");
+    setTotal("");
     toast({
       title: "Exam completed!",
-      description: `Great job on your ${examSubject} exam.`,
+      description: `Results for ${examSubject} have been recorded.`,
     });
   };
 
@@ -47,23 +71,40 @@ export function MarkCompleteDialog({ examSubject, onComplete }: MarkCompleteDial
       </DialogTrigger>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle>Mark {examSubject} as Completed</DialogTitle>
+          <DialogTitle>Complete {examSubject}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-          <div className="space-y-2">
-            <Label htmlFor="score">Exam Score (out of 100)</Label>
-            <Input 
-              id="score" 
-              type="number" 
-              placeholder="e.g. 85" 
-              min="0"
-              max="100"
-              value={score}
-              onChange={(e) => setScore(e.target.value)}
-              required
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="gained">Marks Gained</Label>
+              <Input 
+                id="gained" 
+                type="number" 
+                placeholder="e.g. 85" 
+                value={gained}
+                onChange={(e) => setGained(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="total">Total Marks</Label>
+              <Input 
+                id="total" 
+                type="number" 
+                placeholder="e.g. 100" 
+                value={total}
+                onChange={(e) => setTotal(e.target.value)}
+                required
+              />
+            </div>
           </div>
-          <Button type="submit" className="w-full bg-accent text-white hover:bg-accent/90">Submit Score</Button>
+          <div className="bg-muted/30 p-4 rounded-lg text-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold mb-1">Estimated Grade</p>
+            <p className="text-2xl font-black text-primary">
+              {gained && total && parseFloat(total) > 0 ? Math.round((parseFloat(gained) / parseFloat(total)) * 100) : 0}%
+            </p>
+          </div>
+          <Button type="submit" className="w-full bg-accent text-white hover:bg-accent/90">Submit Results</Button>
         </form>
       </DialogContent>
     </Dialog>
