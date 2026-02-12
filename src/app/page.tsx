@@ -101,13 +101,13 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl mx-auto w-full p-6 md:p-10 overflow-auto">
-        <header className="mb-10">
-          <h1 className="text-3xl font-bold text-foreground">Welcome back, Student!</h1>
-          <p className="text-muted-foreground mt-1">Stay focused and track your academic journey.</p>
-        </header>
-
         {activeTab === 'dashboard' && (
           <div className="space-y-10 animate-in fade-in duration-500">
+            <header className="mb-10">
+              <h1 className="text-3xl font-bold text-foreground">Welcome back, Student!</h1>
+              <p className="text-muted-foreground mt-1">Stay focused and track your academic journey.</p>
+            </header>
+
             {/* Featured Next Exam */}
             {nextExam ? (
               <Card className="border-none bg-gradient-to-r from-primary to-accent text-white shadow-xl shadow-primary/20 overflow-hidden relative">
