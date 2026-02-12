@@ -9,7 +9,7 @@ import { StudyPlanTool } from "@/components/exam/StudyPlanTool";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, History, LayoutDashboard, BrainCircuit, Trash2, Clock, MapPin, ChevronRight } from "lucide-react";
+import { Calendar, History, LayoutDashboard, BrainCircuit, Trash2, Clock, Sparkles, ChevronRight } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -123,14 +123,6 @@ export default function Home() {
                    </div>
                    <div className="flex gap-3">
                       <MarkCompleteDialog examSubject={nextExam.subject} onComplete={(s) => markCompleted(nextExam.id, s)} />
-                      <Button 
-                        variant="secondary" 
-                        onClick={() => setActiveTab('study')}
-                        className="bg-white text-primary hover:bg-white/90"
-                      >
-                        Study Plan
-                        <ChevronRight className="ml-2 h-4 w-4" />
-                      </Button>
                    </div>
                 </CardContent>
               </Card>
