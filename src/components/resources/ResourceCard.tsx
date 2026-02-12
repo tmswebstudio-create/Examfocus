@@ -5,7 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Link as LinkIcon, ExternalLink, Globe, FileText, Youtube, Trash2, X } from "lucide-react";
+import { 
+  Plus, Link as LinkIcon, ExternalLink, Globe, FileText, Youtube, Trash2, X,
+  Video, BookOpen, Github, Code, Image as ImageIcon, MonitorPlay, Database, Mail, MessageSquare, Linkedin, Twitter
+} from "lucide-react";
 import { type Resource, type ResourceLink } from "@/app/lib/resource-store";
 import Image from "next/image";
 
@@ -17,10 +20,21 @@ interface ResourceCardProps {
 }
 
 const ICON_OPTIONS = [
+  { name: 'Link', icon: LinkIcon },
   { name: 'Globe', icon: Globe },
   { name: 'FileText', icon: FileText },
   { name: 'Youtube', icon: Youtube },
-  { name: 'Link', icon: LinkIcon },
+  { name: 'Video', icon: Video },
+  { name: 'BookOpen', icon: BookOpen },
+  { name: 'Github', icon: Github },
+  { name: 'Code', icon: Code },
+  { name: 'Image', icon: ImageIcon },
+  { name: 'MonitorPlay', icon: MonitorPlay },
+  { name: 'Database', icon: Database },
+  { name: 'Mail', icon: Mail },
+  { name: 'MessageSquare', icon: MessageSquare },
+  { name: 'Linkedin', icon: Linkedin },
+  { name: 'Twitter', icon: Twitter },
 ];
 
 export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: ResourceCardProps) {
@@ -117,16 +131,18 @@ export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: Re
                 className="h-8 text-sm"
               />
             </div>
-            <div className="space-y-1">
-              <Label className="text-[10px] uppercase font-bold tracking-wider opacity-60">Icon</Label>
-              <div className="flex gap-2">
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase font-bold tracking-wider opacity-60">Select Icon</Label>
+              <div className="grid grid-cols-5 gap-2">
                 {ICON_OPTIONS.map((opt) => (
                   <Button
                     key={opt.name}
+                    type="button"
                     variant={selectedIcon === opt.name ? "default" : "outline"}
                     size="icon"
                     className="h-8 w-8"
                     onClick={() => setSelectedIcon(opt.name)}
+                    title={opt.name}
                   >
                     <opt.icon className="h-4 w-4" />
                   </Button>
@@ -134,7 +150,7 @@ export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: Re
               </div>
             </div>
             <div className="flex gap-2 pt-2">
-              <Button size="sm" className="flex-1" onClick={handleAddLink}>Add</Button>
+              <Button size="sm" className="flex-1" onClick={handleAddLink}>Add Link</Button>
               <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>Cancel</Button>
             </div>
           </div>
