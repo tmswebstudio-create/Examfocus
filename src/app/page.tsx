@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 
 export default function Home() {
@@ -115,7 +116,7 @@ export default function Home() {
       </nav>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl mx-auto w-full p-6 md:p-10 overflow-auto">
+      <main className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 md:p-8 overflow-y-auto">
         {activeTab === 'dashboard' && (
           <div className="space-y-10 animate-in fade-in duration-500">
             <header className="mb-10">
@@ -232,55 +233,57 @@ export default function Home() {
               <Badge className="bg-accent text-white">{pastExams.length} Completed</Badge>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
-               <table className="w-full text-left">
-                  <thead className="bg-muted/30 border-b border-border">
-                    <tr>
-                      <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Subject</th>
-                      <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Date</th>
-                      <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Score</th>
-                      <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Result (%)</th>
-                      <th className="px-6 py-4 text-sm font-semibold text-muted-foreground text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pastExams.map((exam) => (
-                      <tr key={exam.id} className="border-b border-border/50 last:border-none hover:bg-muted/10 transition-colors">
-                        <td className="px-6 py-4 font-medium">{exam.subject}</td>
-                        <td className="px-6 py-4 text-muted-foreground text-sm">{format(parseISO(exam.date), 'MMM d, yyyy')}</td>
-                        <td className="px-6 py-4 text-sm font-medium">
-                          {exam.gainedMark !== undefined ? `${exam.gainedMark} / ${exam.totalMark}`: 'N/A'}
-                        </td>
-                        <td className="px-6 py-4">
-                          {exam.score !== undefined && (
-                            <Badge className={exam.score! >= 70 ? "bg-green-100 text-green-700 hover:bg-green-100 border-none" : "bg-orange-100 text-orange-700 hover:bg-orange-100 border-none"}>
-                              {exam.score}%
-                            </Badge>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <EditExamDialog exam={exam} onUpdate={updateExam} />
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="text-muted-foreground hover:text-destructive"
-                              onClick={() => deleteExam(exam.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    {pastExams.length === 0 && (
+               <div className="overflow-x-auto">
+                 <table className="w-full text-left min-w-[640px]">
+                    <thead className="bg-muted/30 border-b border-border">
                       <tr>
-                        <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
-                          No past exam records found.
-                        </td>
+                        <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Subject</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Date</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Score</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Result (%)</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-muted-foreground text-right">Actions</th>
                       </tr>
-                    )}
-                  </tbody>
-               </table>
+                    </thead>
+                    <tbody>
+                      {pastExams.map((exam) => (
+                        <tr key={exam.id} className="border-b border-border/50 last:border-none hover:bg-muted/10 transition-colors">
+                          <td className="px-6 py-4 font-medium">{exam.subject}</td>
+                          <td className="px-6 py-4 text-muted-foreground text-sm">{format(parseISO(exam.date), 'MMM d, yyyy')}</td>
+                          <td className="px-6 py-4 text-sm font-medium">
+                            {exam.gainedMark !== undefined ? `${exam.gainedMark} / ${exam.totalMark}`: 'N/A'}
+                          </td>
+                          <td className="px-6 py-4">
+                            {exam.score !== undefined && (
+                              <Badge className={exam.score! >= 70 ? "bg-green-100 text-green-700 hover:bg-green-100 border-none" : "bg-orange-100 text-orange-700 hover:bg-orange-100 border-none"}>
+                                {exam.score}%
+                              </Badge>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <EditExamDialog exam={exam} onUpdate={updateExam} />
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="text-muted-foreground hover:text-destructive"
+                                onClick={() => deleteExam(exam.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {pastExams.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                            No past exam records found.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                 </table>
+               </div>
             </div>
           </div>
         )}

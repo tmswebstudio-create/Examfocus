@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { collection, doc, serverTimestamp } from "firebase/firestore";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
@@ -36,7 +36,7 @@ export function useExams() {
   if(error) console.error(error);
 
 
-  const addExam = (exam: Omit<Exam, 'id' | 'completed' | 'userId'>) => {
+  const addExam = useCallback((exam: Omit<Exam, 'id' | 'completed' | 'userId'>) => {
     if (!user || !examsQuery) return;
     const newExam = {
       ...exam,
@@ -46,21 +46,21 @@ export function useExams() {
       updatedAt: serverTimestamp(),
     };
     addDocumentNonBlocking(examsQuery, newExam);
-  };
+  }, [user, examsQuery]);
 
-  const updateExam = (id: string, updates: Partial<Omit<Exam, 'id' | 'userId'>>) => {
+  const updateExam = useCallback((id: string, updates: Partial<Omit<Exam, 'id' | 'userId'>>) => {
     if (!user || !examsCollectionPath) return;
     const docRef = doc(firestore, examsCollectionPath, id);
     updateDocumentNonBlocking(docRef, { ...updates, updatedAt: serverTimestamp() });
-  };
+  }, [user, firestore, examsCollectionPath]);
 
-  const deleteExam = (id: string) => {
+  const deleteExam = useCallback((id: string) => {
     if (!user || !examsCollectionPath) return;
     const docRef = doc(firestore, examsCollectionPath, id);
     deleteDocumentNonBlocking(docRef);
-  };
+  }, [user, firestore, examsCollectionPath]);
 
-  const markCompleted = (id: string, gainedMark: number, totalMark: number) => {
+  const markCompleted = useCallback((id: string, gainedMark: number, totalMark: number) => {
     const score = totalMark > 0 ? Math.round((gainedMark / totalMark) * 100) : 0;
     updateExam(id, { 
       completed: true, 
@@ -68,7 +68,7 @@ export function useExams() {
       gainedMark, 
       totalMark 
     });
-  };
+  }, [updateExam]);
 
   return { exams: exams || [], isLoading, addExam, updateExam, deleteExam, markCompleted };
 }

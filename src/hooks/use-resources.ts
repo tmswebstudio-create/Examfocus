@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { collection, doc, serverTimestamp, arrayUnion, arrayRemove } from "firebase/firestore";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
@@ -34,7 +34,7 @@ export function useResources() {
   const { data: resources, isLoading, error } = useCollection<Resource>(resourcesQuery);
   if(error) console.error(error);
 
-  const addResource = (title: string, imageUrl: string) => {
+  const addResource = useCallback((title: string, imageUrl: string) => {
     if (!user || !resourcesQuery) return;
     const newResource = {
       userId: user.uid,
@@ -45,28 +45,28 @@ export function useResources() {
       updatedAt: serverTimestamp(),
     };
     addDocumentNonBlocking(resourcesQuery, newResource);
-  };
+  }, [user, resourcesQuery]);
   
-  const updateResource = (id: string, updates: Partial<Omit<Resource, 'id' | 'links' | 'userId'>>) => {
+  const updateResource = useCallback((id: string, updates: Partial<Omit<Resource, 'id' | 'links' | 'userId'>>) => {
     if (!user || !resourcesCollectionPath) return;
     const docRef = doc(firestore, resourcesCollectionPath, id);
     updateDocumentNonBlocking(docRef, { ...updates, updatedAt: serverTimestamp() });
-  };
+  }, [user, firestore, resourcesCollectionPath]);
 
-  const deleteResource = (id: string) => {
+  const deleteResource = useCallback((id: string) => {
     if (!user || !resourcesCollectionPath) return;
     const docRef = doc(firestore, resourcesCollectionPath, id);
     deleteDocumentNonBlocking(docRef);
-  };
+  }, [user, firestore, resourcesCollectionPath]);
 
-  const addLinkToResource = (resourceId: string, link: Omit<ResourceLink, 'id'>) => {
+  const addLinkToResource = useCallback((resourceId: string, link: Omit<ResourceLink, 'id'>) => {
     if (!user || !resourcesCollectionPath) return;
     const docRef = doc(firestore, resourcesCollectionPath, resourceId);
     const newLink = { ...link, id: Math.random().toString(36).substring(2, 9) };
     updateDocumentNonBlocking(docRef, { links: arrayUnion(newLink) });
-  };
+  }, [user, firestore, resourcesCollectionPath]);
 
-  const updateLinkInResource = (resourceId: string, linkId: string, updates: Partial<Omit<ResourceLink, 'id'>>) => {
+  const updateLinkInResource = useCallback((resourceId: string, linkId: string, updates: Partial<Omit<ResourceLink, 'id'>>) => {
     if (!resources) return;
     const resource = resources.find(r => r.id === resourceId);
     if (!resource) return;
@@ -75,9 +75,9 @@ export function useResources() {
       l.id === linkId ? { ...l, ...updates } : l
     );
     updateResource(resourceId, { links: updatedLinks });
-  };
+  }, [resources, updateResource]);
   
-  const removeLinkFromResource = (resourceId: string, linkId: string) => {
+  const removeLinkFromResource = useCallback((resourceId: string, linkId: string) => {
     if (!resources) return;
     const resource = resources.find(r => r.id === resourceId);
     const linkToRemove = resource?.links.find(l => l.id === linkId);
@@ -85,7 +85,7 @@ export function useResources() {
 
     const docRef = doc(firestore, resourcesCollectionPath, resourceId);
     updateDocumentNonBlocking(docRef, { links: arrayRemove(linkToRemove) });
-  };
+  }, [resources, firestore, resourcesCollectionPath]);
 
 
   return { 
