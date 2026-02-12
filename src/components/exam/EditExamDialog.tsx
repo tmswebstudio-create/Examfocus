@@ -21,6 +21,7 @@ export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: Edit
   const [subject, setSubject] = useState(exam.subject);
   const [syllabus, setSyllabus] = useState(exam.syllabus || "");
   const [date, setDate] = useState(exam.date);
+  const [time, setTime] = useState(exam.time || "");
   const [notes, setNotes] = useState(exam.notes || "");
   const { toast } = useToast();
 
@@ -34,7 +35,7 @@ export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: Edit
       });
       return;
     }
-    onUpdate(exam.id, { subject, syllabus, date, notes });
+    onUpdate(exam.id, { subject, syllabus, date, time, notes });
     setOpen(false);
     toast({
       title: "Exam updated",
@@ -83,14 +84,25 @@ export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: Edit
               onChange={(e) => setSyllabus(e.target.value)}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="date">Exam Date</Label>
-            <Input 
-              id="date" 
-              type="date" 
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="date">Exam Date</Label>
+              <Input 
+                id="date" 
+                type="date" 
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="time">Exam Time</Label>
+              <Input 
+                id="time" 
+                type="time" 
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="notes">Extra Notes</Label>

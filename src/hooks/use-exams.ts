@@ -12,6 +12,7 @@ export type Exam = {
   subject: string;
   syllabus?: string;
   date: string; // YYYY-MM-DD
+  time?: string;
   notes?: string;
   completed: boolean;
   score?: number; // Percentage

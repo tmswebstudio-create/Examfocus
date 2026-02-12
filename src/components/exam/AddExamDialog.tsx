@@ -10,7 +10,7 @@ import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface AddExamDialogProps {
-  onAdd: (exam: { subject: string; syllabus?: string; date: string; notes?: string }) => void;
+  onAdd: (exam: { subject: string; syllabus?: string; date: string; time?: string; notes?: string }) => void;
 }
 
 export function AddExamDialog({ onAdd }: AddExamDialogProps) {
@@ -18,6 +18,7 @@ export function AddExamDialog({ onAdd }: AddExamDialogProps) {
   const [subject, setSubject] = useState("");
   const [syllabus, setSyllabus] = useState("");
   const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
   const [notes, setNotes] = useState("");
   const { toast } = useToast();
 
@@ -31,10 +32,11 @@ export function AddExamDialog({ onAdd }: AddExamDialogProps) {
       });
       return;
     }
-    onAdd({ subject, syllabus, date, notes });
+    onAdd({ subject, syllabus, date, time, notes });
     setSubject("");
     setSyllabus("");
     setDate("");
+    setTime("");
     setNotes("");
     setOpen(false);
     toast({
@@ -74,14 +76,25 @@ export function AddExamDialog({ onAdd }: AddExamDialogProps) {
               onChange={(e) => setSyllabus(e.target.value)}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="date">Exam Date</Label>
-            <Input 
-              id="date" 
-              type="date" 
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="date">Exam Date</Label>
+              <Input 
+                id="date" 
+                type="date" 
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="time">Exam Time (Optional)</Label>
+              <Input 
+                id="time" 
+                type="time" 
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="notes">Extra Notes</Label>

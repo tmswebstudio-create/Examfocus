@@ -75,6 +75,11 @@
           "description": "The scheduled date of the exam in YYYY-MM-DD format.",
           "format": "date"
         },
+        "time": {
+          "type": "string",
+          "description": "The scheduled time of the exam.",
+          "format": "time"
+        },
         "notes": {
           "type": "string",
           "description": "Optional notes related to the exam."

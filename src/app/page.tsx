@@ -143,6 +143,13 @@ export default function Home() {
                   <div className="flex items-center gap-2 opacity-80">
                     <Calendar className="h-4 w-4" />
                     <span>{format(parseISO(nextExam.date), 'EEE, MMM d, yyyy')}</span>
+                    {nextExam.time && (
+                        <>
+                            <span className="opacity-50">|</span>
+                            <Clock className="h-4 w-4" />
+                            <span>{format(parseISO(`1970-01-01T${nextExam.time}`), 'p')}</span>
+                        </>
+                    )}
                   </div>
                   {nextExam.syllabus && (
                     <div className="flex items-start gap-2 opacity-80">
@@ -218,6 +225,13 @@ export default function Home() {
                       <div className="flex items-center gap-2 text-muted-foreground">
                           <Calendar className="h-4 w-4" />
                           <span>{format(parseISO(exam.date), 'EEE, MMM d, yyyy')}</span>
+                          {exam.time && (
+                            <>
+                                <span className="text-muted-foreground/50">|</span>
+                                <Clock className="h-4 w-4" />
+                                <span>{format(parseISO(`1970-01-01T${exam.time}`), 'p')}</span>
+                            </>
+                          )}
                       </div>
                       {exam.syllabus && (
                           <div className="flex items-start gap-2">
