@@ -1,23 +1,26 @@
 "use client";
 
 import { useExams } from "@/app/lib/exam-store";
+import { useResources } from "@/app/lib/resource-store";
 import { AddExamDialog } from "@/components/exam/AddExamDialog";
 import { ExamCountdown } from "@/components/exam/Countdown";
 import { MarkCompleteDialog } from "@/components/exam/MarkCompleteDialog";
 import { PerformanceDashboard } from "@/components/dashboard/PerformanceDashboard";
-import { StudyPlanTool } from "@/components/exam/StudyPlanTool";
+import { ResourceCard } from "@/components/resources/ResourceCard";
+import { AddResourceDialog } from "@/components/resources/AddResourceDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, History, LayoutDashboard, BrainCircuit, Trash2, Clock, Sparkles } from "lucide-react";
+import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
-  const { exams, isLoaded, addExam, markCompleted, deleteExam } = useExams();
+  const { exams, isLoaded: examsLoaded, addExam, markCompleted, deleteExam } = useExams();
+  const { resources, isLoaded: resourcesLoaded, addResource, addLinkToResource, deleteResource, removeLinkFromResource } = useResources();
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  if (!isLoaded) {
+  if (!examsLoaded || !resourcesLoaded) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">
@@ -75,12 +78,12 @@ export default function Home() {
             Exam History
           </Button>
           <Button 
-            variant={activeTab === 'study' ? 'secondary' : 'ghost'} 
+            variant={activeTab === 'resources' ? 'secondary' : 'ghost'} 
             className="justify-start px-3"
-            onClick={() => setActiveTab('study')}
+            onClick={() => setActiveTab('resources')}
           >
-            <BrainCircuit className="mr-3 h-4 w-4 text-primary" />
-            Study Assistant
+            <Library className="mr-3 h-4 w-4 text-primary" />
+            Resources
           </Button>
         </nav>
 
@@ -99,7 +102,13 @@ export default function Home() {
             <h1 className="text-3xl font-bold text-foreground">Welcome back, Student!</h1>
             <p className="text-muted-foreground mt-1">Stay focused and track your academic journey.</p>
           </div>
-          <AddExamDialog onAdd={addExam} />
+          <div className="flex gap-2">
+            {activeTab === 'resources' ? (
+              <AddResourceDialog onAdd={addResource} />
+            ) : (
+              <AddExamDialog onAdd={addExam} />
+            )}
+          </div>
         </header>
 
         {activeTab === 'dashboard' && (
@@ -255,51 +264,39 @@ export default function Home() {
           </div>
         )}
 
-        {activeTab === 'study' && (activeTab === 'study' && (
-          <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500 max-w-4xl">
-             <div className="flex items-center gap-3 mb-8">
-                <div className="bg-accent p-3 rounded-2xl shadow-lg shadow-accent/20">
-                  <BrainCircuit className="text-white h-6 w-6" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold">AI Study Assistant</h2>
-                  <p className="text-muted-foreground">Choose an upcoming exam to generate a custom study plan.</p>
-                </div>
-             </div>
+        {activeTab === 'resources' && (
+          <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-3xl font-bold">Study Resources</h2>
+              <p className="text-muted-foreground">Keep all your study materials, cheat sheets, and references in one place.</p>
+            </div>
 
-             {upcomingExams.length > 0 ? (
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                     <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-2">Select Target Exam</h3>
-                     <div className="flex flex-col gap-3">
-                        {upcomingExams.map((exam) => (
-                          <div key={exam.id} className="group cursor-pointer">
-                            <StudyPlanTool exam={exam} history={pastExams} />
-                          </div>
-                        ))}
-                     </div>
-                  </div>
-                  <div className="hidden md:block">
-                     <Card className="bg-primary/5 border-none h-full p-8 flex flex-col justify-center items-center text-center">
-                        <div className="bg-white p-6 rounded-full shadow-lg mb-6">
-                           <Sparkles className="h-10 w-10 text-accent" />
-                        </div>
-                        <h3 className="text-xl font-bold text-primary mb-4">Science-Backed Planning</h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          Our AI analyzes your historical performance to prioritize topics you've struggled with in the past, while leveraging your strengths to build a balanced study schedule.
-                        </p>
-                     </Card>
-                  </div>
-               </div>
-             ) : (
-               <Card className="p-12 text-center flex flex-col items-center border-dashed border-2">
-                  <History className="h-10 w-10 text-muted-foreground mb-4 opacity-50" />
-                  <p className="text-muted-foreground">No upcoming exams found. Schedule an exam first to use the AI Study Assistant.</p>
-                  <Button variant="link" onClick={() => setActiveTab('dashboard')} className="mt-2 text-primary">Back to Dashboard</Button>
-               </Card>
-             )}
+            {resources.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {resources.map((resource) => (
+                  <ResourceCard 
+                    key={resource.id} 
+                    resource={resource} 
+                    onAddLink={addLinkToResource}
+                    onDelete={deleteResource}
+                    onRemoveLink={removeLinkFromResource}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Card className="p-20 text-center flex flex-col items-center border-dashed border-2">
+                <div className="bg-muted/50 p-6 rounded-full mb-6">
+                  <BookOpen className="h-12 w-12 text-muted-foreground opacity-50" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Build Your Library</h3>
+                <p className="text-muted-foreground max-w-sm mb-8">
+                  Add resource cards for different subjects and attach links to videos, articles, or PDF documents.
+                </p>
+                <AddResourceDialog onAdd={addResource} />
+              </Card>
+            )}
           </div>
-        ))}
+        )}
       </main>
     </div>
   );
