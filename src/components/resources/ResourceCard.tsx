@@ -223,7 +223,7 @@ export function ResourceCard({ resource, onAddLink, onUpdateLink, onUpdateResour
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-6 w-6 text-muted-foreground hover:text-primary"
+                          className="h-6 w-6 text-primary hover:bg-primary hover:text-white"
                           onClick={() => handleEditLink(link)}
                         >
                           <Pencil className="h-3 w-3" />
@@ -231,7 +231,7 @@ export function ResourceCard({ resource, onAddLink, onUpdateLink, onUpdateResour
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-6 w-6 text-destructive"
+                          className="h-6 w-6 text-destructive hover:bg-destructive hover:text-white"
                           onClick={() => onRemoveLink(resource.id, link.id)}
                         >
                           <X className="h-3 w-3" />
