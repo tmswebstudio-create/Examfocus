@@ -31,7 +31,7 @@ export function useResources() {
     resourcesCollectionPath ? collection(firestore, resourcesCollectionPath) : null
   , [firestore, resourcesCollectionPath]);
 
-  const { data: resources, isLoading: isLoaded, error } = useCollection<Resource>(resourcesQuery);
+  const { data: resources, isLoading, error } = useCollection<Resource>(resourcesQuery);
   if(error) console.error(error);
 
   const addResource = (title: string, imageUrl: string) => {
@@ -90,7 +90,7 @@ export function useResources() {
 
   return { 
     resources: resources || [], 
-    isLoaded, 
+    isLoading, 
     addResource, 
     updateResource,
     addLinkToResource, 

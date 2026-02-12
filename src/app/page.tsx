@@ -27,10 +27,10 @@ export default function Home() {
   const router = useRouter();
   const auth = useAuth();
 
-  const { exams, isLoaded: examsLoaded, addExam, updateExam, markCompleted, deleteExam } = useExams();
+  const { exams, isLoading: examsLoading, addExam, updateExam, markCompleted, deleteExam } = useExams();
   const { 
     resources, 
-    isLoaded: resourcesLoaded, 
+    isLoading: resourcesLoading, 
     addResource, 
     updateResource, 
     addLinkToResource, 
@@ -46,7 +46,7 @@ export default function Home() {
     }
   }, [user, isUserLoading, router]);
 
-  if (isUserLoading || !user || !examsLoaded || !resourcesLoaded || isProfileLoading) {
+  if (isUserLoading || !user || examsLoading || resourcesLoading || isProfileLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">

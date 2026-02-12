@@ -32,7 +32,7 @@ export function useExams() {
   , [firestore, examsCollectionPath]);
 
   // Subscribe to the collection
-  const { data: exams, isLoading: isLoaded, error } = useCollection<Exam>(examsQuery);
+  const { data: exams, isLoading, error } = useCollection<Exam>(examsQuery);
   if(error) console.error(error);
 
 
@@ -70,5 +70,5 @@ export function useExams() {
     });
   };
 
-  return { exams: exams || [], isLoaded, addExam, updateExam, deleteExam, markCompleted };
+  return { exams: exams || [], isLoading, addExam, updateExam, deleteExam, markCompleted };
 }
