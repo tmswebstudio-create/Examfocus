@@ -13,7 +13,7 @@ import { type Exam } from "@/hooks/use-exams";
 interface EditExamDialogProps {
   exam: Exam;
   onUpdate: (id: string, exam: Partial<Omit<Exam, 'id'>>) => void;
-  triggerVariant?: "icon" | "outline";
+  triggerVariant?: "icon" | "outline" | "featured-icon";
 }
 
 export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: EditExamDialogProps) {
@@ -45,7 +45,11 @@ export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: Edit
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {triggerVariant === "icon" ? (
+        {triggerVariant === 'featured-icon' ? (
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/20">
+            <Pencil className="h-4 w-4" />
+          </Button>
+        ) : triggerVariant === "icon" ? (
           <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
             <Pencil className="h-4 w-4" />
           </Button>

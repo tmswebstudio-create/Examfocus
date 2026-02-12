@@ -126,30 +126,53 @@ export default function Home() {
 
             {/* Featured Next Exam */}
             {nextExam ? (
-              <Card className="border-none bg-gradient-to-r from-primary to-accent text-white shadow-xl shadow-primary/20 overflow-hidden relative">
+              <Card className="border-none bg-gradient-to-r from-primary to-accent text-white shadow-xl shadow-primary/20 overflow-hidden relative flex flex-col">
                 <div className="absolute -right-10 -top-10 bg-white/10 rounded-full h-40 w-40 blur-3xl"></div>
-                <CardHeader className="pb-2">
-                   <div className="flex justify-between items-start">
-                     <Badge variant="outline" className="w-fit text-white border-white/40 bg-white/10 mb-2">Next Milestone</Badge>
-                     <EditExamDialog exam={nextExam} onUpdate={updateExam} triggerVariant="icon" />
-                   </div>
-                   <CardTitle className="text-4xl font-black tracking-tight">{nextExam.subject}</CardTitle>
-                   <div className="flex items-center gap-2 opacity-80 mt-1">
-                      <Calendar className="h-4 w-4" />
-                      <span className="font-medium">{format(parseISO(nextExam.date), 'MMMM d, yyyy')}</span>
-                   </div>
+                <CardHeader className="relative pb-4">
+                  <div className="flex justify-between items-start">
+                    <Badge variant="outline" className="w-fit text-white border-white/40 bg-white/10 mb-2">Next Milestone</Badge>
+                    <div className="absolute top-4 right-4">
+                      <EditExamDialog exam={nextExam} onUpdate={updateExam} triggerVariant="featured-icon" />
+                    </div>
+                  </div>
+                  <CardTitle className="text-2xl font-bold tracking-tight pr-8">{nextExam.subject}</CardTitle>
                 </CardHeader>
-                <CardContent className="flex flex-col md:flex-row items-center justify-between gap-8 py-8">
-                   <div className="bg-white/10 p-8 md:p-10 rounded-3xl backdrop-blur-xl border border-white/20 w-full md:w-auto shadow-2xl">
-                      <ExamCountdown date={nextExam.date} variant="featured" />
-                   </div>
-                   <div className="flex gap-3">
-                      <MarkCompleteDialog 
-                        examSubject={nextExam.subject} 
-                        onComplete={(g, t) => markCompleted(nextExam.id, g, t)} 
-                      />
-                   </div>
+                <CardContent className="flex-1 pt-0 space-y-3 text-sm">
+                  <div className="flex items-center gap-2 opacity-80">
+                    <Calendar className="h-4 w-4" />
+                    <span>{format(parseISO(nextExam.date), 'EEE, MMM d, yyyy')}</span>
+                  </div>
+                  {nextExam.syllabus && (
+                    <div className="flex items-start gap-2 opacity-80">
+                      <BookOpen className="h-4 w-4 mt-0.5 shrink-0" />
+                      <p><span className="font-semibold opacity-100">Syllabus:</span> {nextExam.syllabus}</p>
+                    </div>
+                  )}
+                  {nextExam.notes && (
+                    <div className="flex items-start gap-2 opacity-80">
+                      <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                      <p><span className="font-semibold opacity-100">Extra Notes:</span> {nextExam.notes}</p>
+                    </div>
+                  )}
+                  <div className="pt-4 mt-4 border-t border-white/20 flex justify-center">
+                    <ExamCountdown date={nextExam.date} variant="featured" />
+                  </div>
                 </CardContent>
+                <div className="p-4 bg-black/10 flex items-center justify-between">
+                  <MarkCompleteDialog
+                    examSubject={nextExam.subject}
+                    onComplete={(g, t) => markCompleted(nextExam.id, g, t)}
+                    variant="featured"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white/70 hover:text-white hover:bg-white/20 h-8 w-8"
+                    onClick={() => deleteExam(nextExam.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </Card>
             ) : (
               <Card className="border-dashed border-2 bg-muted/30 p-10 flex flex-col items-center justify-center text-center">
@@ -246,7 +269,7 @@ export default function Home() {
                  <table className="w-full text-left min-w-[640px]">
                     <thead className="bg-muted/30 border-b border-border">
                       <tr>
-                        <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Subject</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Exam Title</th>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Date</th>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Score</th>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Result (%)</th>

@@ -11,9 +11,10 @@ import { useToast } from "@/hooks/use-toast";
 interface MarkCompleteDialogProps {
   examSubject: string;
   onComplete: (gained: number, total: number) => void;
+  variant?: 'default' | 'featured';
 }
 
-export function MarkCompleteDialog({ examSubject, onComplete }: MarkCompleteDialogProps) {
+export function MarkCompleteDialog({ examSubject, onComplete, variant = 'default' }: MarkCompleteDialogProps) {
   const [open, setOpen] = useState(false);
   const [gained, setGained] = useState("");
   const [total, setTotal] = useState("");
@@ -64,10 +65,17 @@ export function MarkCompleteDialog({ examSubject, onComplete }: MarkCompleteDial
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white transition-colors">
-          <CheckCircle2 className="mr-2 h-4 w-4" />
-          Complete
-        </Button>
+        {variant === 'featured' ? (
+          <Button variant="outline" className="bg-white/10 border-white/50 text-white hover:bg-white hover:text-primary">
+            <CheckCircle2 className="mr-2 h-4 w-4" />
+            Complete
+          </Button>
+        ) : (
+          <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white transition-colors">
+            <CheckCircle2 className="mr-2 h-4 w-4" />
+            Complete
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
