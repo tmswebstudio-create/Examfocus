@@ -11,21 +11,20 @@ import { ResourceCard } from "@/components/resources/ResourceCard";
 import { AddResourceDialog } from "@/components/resources/AddResourceDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen, LogOut } from "lucide-react";
+import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/firebase";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/firebase";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 
 export default function Home() {
   const { user, isUserLoading } = useUser();
   const { userProfile, isProfileLoading } = useUserProfile();
   const router = useRouter();
-  const auth = useAuth();
 
   const { exams, isLoading: examsLoading, addExam, updateExam, markCompleted, deleteExam } = useExams();
   const { 
@@ -66,11 +65,6 @@ export default function Home() {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const nextExam = upcomingExams[0];
-
-  const handleLogout = () => {
-    auth.signOut();
-    router.push('/login');
-  };
 
   const navItems = [
     { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -115,9 +109,7 @@ export default function Home() {
             ) : (
               <AddExamDialog onAdd={addExam} />
             )}
-            <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout">
-              <LogOut className="h-4 w-4" />
-            </Button>
+            <ProfileDropdown />
           </div>
         </div>
       </nav>

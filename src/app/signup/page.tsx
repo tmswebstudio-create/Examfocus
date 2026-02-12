@@ -55,6 +55,7 @@ export default function SignupPage() {
         firstName,
         lastName,
         email,
+        photoURL: "",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
