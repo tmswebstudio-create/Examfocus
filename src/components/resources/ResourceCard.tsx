@@ -17,10 +17,13 @@ import {
 import { type Resource, type ResourceLink } from "@/app/lib/resource-store";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface ResourceCardProps {
   resource: Resource;
   onAddLink: (resourceId: string, link: Omit<ResourceLink, 'id'>) => void;
+  onUpdateLink: (resourceId: string, linkId: string, updates: Partial<Omit<ResourceLink, 'id'>>) => void;
+  onUpdateResource: (id: string, updates: { title: string; imageUrl: string }) => void;
   onDelete: (id: string) => void;
   onRemoveLink: (resourceId: string, linkId: string) => void;
 }
@@ -74,12 +77,18 @@ const ICON_OPTIONS = [
   { name: 'Pin', icon: Pin },
 ];
 
-export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: ResourceCardProps) {
+export function ResourceCard({ resource, onAddLink, onUpdateLink, onUpdateResource, onDelete, onRemoveLink }: ResourceCardProps) {
   const [isAdding, setIsAdding] = useState(false);
+  const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
+  
   const [label, setLabel] = useState("");
   const [url, setUrl] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("Link");
   const [iconSearch, setIconSearch] = useState("");
+
+  const [editTitle, setEditTitle] = useState(resource.title);
+  const [editImage, setEditImage] = useState(resource.imageUrl);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const filteredIcons = useMemo(() => {
     return ICON_OPTIONS.filter(opt => 
@@ -89,11 +98,35 @@ export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: Re
 
   const handleAddLink = () => {
     if (!label || !url) return;
-    onAddLink(resource.id, { label, url, icon: selectedIcon });
+    if (editingLinkId) {
+      onUpdateLink(resource.id, editingLinkId, { label, url, icon: selectedIcon });
+    } else {
+      onAddLink(resource.id, { label, url, icon: selectedIcon });
+    }
+    resetForm();
+  };
+
+  const handleEditLink = (link: ResourceLink) => {
+    setEditingLinkId(link.id);
+    setLabel(link.label);
+    setUrl(link.url);
+    setSelectedIcon(link.icon);
+    setIsAdding(true);
+  };
+
+  const resetForm = () => {
     setLabel("");
     setUrl("");
+    setEditingLinkId(null);
     setIsAdding(false);
     setIconSearch("");
+    setSelectedIcon("Link");
+  };
+
+  const handleUpdateResource = (e: React.FormEvent) => {
+    e.preventDefault();
+    onUpdateResource(resource.id, { title: editTitle, imageUrl: editImage });
+    setIsEditDialogOpen(false);
   };
 
   return (
@@ -104,17 +137,41 @@ export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: Re
           alt={resource.title} 
           fill 
           className="object-cover"
-          data-ai-hint="educational resource"
         />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-        <Button 
-          variant="destructive" 
-          size="icon" 
-          className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={() => onDelete(resource.id)}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="secondary" size="icon" className="h-8 w-8 bg-white/90 hover:bg-white text-primary shadow-sm">
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Edit Resource Card</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleUpdateResource} className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Title</Label>
+                  <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required />
+                </div>
+                <div className="space-y-2">
+                  <Label>Image URL</Label>
+                  <Input value={editImage} onChange={(e) => setEditImage(e.target.value)} />
+                </div>
+                <Button type="submit" className="w-full">Save Changes</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+          <Button 
+            variant="destructive" 
+            size="icon" 
+            className="h-8 w-8 shadow-sm"
+            onClick={() => onDelete(resource.id)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       
       <CardHeader className="pb-3">
@@ -133,20 +190,30 @@ export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: Re
                       href={link.url} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="flex items-center gap-2 text-sm text-primary hover:underline font-medium truncate"
+                      className="flex items-center gap-2 text-sm text-primary hover:underline font-medium truncate flex-1"
                     >
                       <IconComp className="h-4 w-4 shrink-0" />
                       <span className="truncate">{link.label}</span>
                       <ExternalLink className="h-3 w-3 opacity-50 shrink-0" />
                     </a>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-6 w-6 text-destructive opacity-0 group-hover/link:opacity-100 transition-opacity"
-                      onClick={() => onRemoveLink(resource.id, link.id)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+                    <div className="flex items-center opacity-0 group-hover/link:opacity-100 transition-opacity">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6 text-muted-foreground hover:text-primary"
+                        onClick={() => handleEditLink(link)}
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6 text-destructive"
+                        onClick={() => onRemoveLink(resource.id, link.id)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
@@ -216,8 +283,10 @@ export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: Re
             </div>
 
             <div className="flex gap-2 pt-2">
-              <Button size="sm" className="flex-1 bg-primary" onClick={handleAddLink}>Add Link</Button>
-              <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>Cancel</Button>
+              <Button size="sm" className="flex-1 bg-primary" onClick={handleAddLink}>
+                {editingLinkId ? "Update Link" : "Add Link"}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={resetForm}>Cancel</Button>
             </div>
           </div>
         ) : (

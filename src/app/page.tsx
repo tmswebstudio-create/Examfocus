@@ -3,6 +3,7 @@
 import { useExams } from "@/app/lib/exam-store";
 import { useResources } from "@/app/lib/resource-store";
 import { AddExamDialog } from "@/components/exam/AddExamDialog";
+import { EditExamDialog } from "@/components/exam/EditExamDialog";
 import { ExamCountdown } from "@/components/exam/Countdown";
 import { MarkCompleteDialog } from "@/components/exam/MarkCompleteDialog";
 import { PerformanceDashboard } from "@/components/dashboard/PerformanceDashboard";
@@ -10,15 +11,24 @@ import { ResourceCard } from "@/components/resources/ResourceCard";
 import { AddResourceDialog } from "@/components/resources/AddResourceDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen } from "lucide-react";
+import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen, Pencil } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
-  const { exams, isLoaded: examsLoaded, addExam, markCompleted, deleteExam } = useExams();
-  const { resources, isLoaded: resourcesLoaded, addResource, addLinkToResource, deleteResource, removeLinkFromResource } = useResources();
+  const { exams, isLoaded: examsLoaded, addExam, updateExam, markCompleted, deleteExam } = useExams();
+  const { 
+    resources, 
+    isLoaded: resourcesLoaded, 
+    addResource, 
+    updateResource, 
+    addLinkToResource, 
+    updateLinkInResource,
+    deleteResource, 
+    removeLinkFromResource 
+  } = useResources();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   if (!examsLoaded || !resourcesLoaded) {
@@ -103,7 +113,10 @@ export default function Home() {
               <Card className="border-none bg-gradient-to-r from-primary to-accent text-white shadow-xl shadow-primary/20 overflow-hidden relative">
                 <div className="absolute -right-10 -top-10 bg-white/10 rounded-full h-40 w-40 blur-3xl"></div>
                 <CardHeader className="pb-2">
-                   <Badge variant="outline" className="w-fit text-white border-white/40 bg-white/10 mb-2">Next Milestone</Badge>
+                   <div className="flex justify-between items-start">
+                     <Badge variant="outline" className="w-fit text-white border-white/40 bg-white/10 mb-2">Next Milestone</Badge>
+                     <EditExamDialog exam={nextExam} onUpdate={updateExam} triggerVariant="icon" />
+                   </div>
                    <CardTitle className="text-4xl font-black tracking-tight">{nextExam.subject}</CardTitle>
                    <div className="flex items-center gap-2 opacity-80 mt-1">
                       <Calendar className="h-4 w-4" />
@@ -154,8 +167,11 @@ export default function Home() {
                 {upcomingExams.map((exam) => (
                   <Card key={exam.id} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white overflow-hidden flex flex-col">
                     <div className="h-2 bg-primary"></div>
-                    <CardHeader>
-                      <CardTitle className="text-lg leading-tight">{exam.subject}</CardTitle>
+                    <CardHeader className="relative">
+                      <CardTitle className="text-lg leading-tight pr-8">{exam.subject}</CardTitle>
+                      <div className="absolute top-4 right-4">
+                        <EditExamDialog exam={exam} onUpdate={updateExam} />
+                      </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground pt-1">
                         <Calendar className="h-3 w-3" />
                         {format(parseISO(exam.date), 'EEE, MMM d')}
@@ -225,14 +241,17 @@ export default function Home() {
                           </Badge>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="text-muted-foreground hover:text-destructive"
-                            onClick={() => deleteExam(exam.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex items-center justify-end gap-1">
+                            <EditExamDialog exam={exam} onUpdate={updateExam} />
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-muted-foreground hover:text-destructive"
+                              onClick={() => deleteExam(exam.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -263,6 +282,8 @@ export default function Home() {
                     key={resource.id} 
                     resource={resource} 
                     onAddLink={addLinkToResource}
+                    onUpdateLink={updateLinkInResource}
+                    onUpdateResource={updateResource}
                     onDelete={deleteResource}
                     onRemoveLink={removeLinkFromResource}
                   />

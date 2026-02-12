@@ -50,12 +50,28 @@ export function useResources() {
     setResources(prev => [...prev, newResource]);
   };
 
+  const updateResource = (id: string, updates: Partial<Omit<Resource, 'id' | 'links'>>) => {
+    setResources(prev => prev.map(res => res.id === id ? { ...res, ...updates } : res));
+  };
+
   const addLinkToResource = (resourceId: string, link: Omit<ResourceLink, 'id'>) => {
     setResources(prev => prev.map(res => {
       if (res.id === resourceId) {
         return {
           ...res,
           links: [...res.links, { ...link, id: Math.random().toString(36).substring(2, 9) }]
+        };
+      }
+      return res;
+    }));
+  };
+
+  const updateLinkInResource = (resourceId: string, linkId: string, updates: Partial<Omit<ResourceLink, 'id'>>) => {
+    setResources(prev => prev.map(res => {
+      if (res.id === resourceId) {
+        return {
+          ...res,
+          links: res.links.map(l => l.id === linkId ? { ...l, ...updates } : l)
         };
       }
       return res;
@@ -78,5 +94,14 @@ export function useResources() {
     }));
   };
 
-  return { resources, isLoaded, addResource, addLinkToResource, deleteResource, removeLinkFromResource };
+  return { 
+    resources, 
+    isLoaded, 
+    addResource, 
+    updateResource,
+    addLinkToResource, 
+    updateLinkInResource,
+    deleteResource, 
+    removeLinkFromResource 
+  };
 }
