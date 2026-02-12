@@ -14,7 +14,6 @@ import { LogOut } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { useRouter } from 'next/navigation';
-import { EditProfileDialog } from './EditProfileDialog';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
 
 export function ProfileDropdown() {
@@ -54,7 +53,6 @@ export function ProfileDropdown() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <EditProfileDialog />
         <ChangePasswordDialog email={userProfile.email} />
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
