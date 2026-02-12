@@ -10,12 +10,13 @@ import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface AddExamDialogProps {
-  onAdd: (exam: { subject: string; date: string; notes?: string }) => void;
+  onAdd: (exam: { subject: string; syllabus?: string; date: string; notes?: string }) => void;
 }
 
 export function AddExamDialog({ onAdd }: AddExamDialogProps) {
   const [open, setOpen] = useState(false);
   const [subject, setSubject] = useState("");
+  const [syllabus, setSyllabus] = useState("");
   const [date, setDate] = useState("");
   const [notes, setNotes] = useState("");
   const { toast } = useToast();
@@ -30,8 +31,9 @@ export function AddExamDialog({ onAdd }: AddExamDialogProps) {
       });
       return;
     }
-    onAdd({ subject, date, notes });
+    onAdd({ subject, syllabus, date, notes });
     setSubject("");
+    setSyllabus("");
     setDate("");
     setNotes("");
     setOpen(false);
@@ -55,12 +57,21 @@ export function AddExamDialog({ onAdd }: AddExamDialogProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="subject">Subject</Label>
+            <Label htmlFor="subject">Exam Title</Label>
             <Input 
               id="subject" 
               placeholder="e.g. Advanced Mathematics" 
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="syllabus">Syllabus</Label>
+            <Textarea 
+              id="syllabus" 
+              placeholder="e.g. Chapters 1-5, focus on calculus..." 
+              value={syllabus}
+              onChange={(e) => setSyllabus(e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -73,10 +84,10 @@ export function AddExamDialog({ onAdd }: AddExamDialogProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="notes">Optional Notes</Label>
+            <Label htmlFor="notes">Extra Notes</Label>
             <Textarea 
               id="notes" 
-              placeholder="Chapters 1-5, focus on calculus..." 
+              placeholder="e.g. Bring a specific calculator model." 
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />

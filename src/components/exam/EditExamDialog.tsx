@@ -19,6 +19,7 @@ interface EditExamDialogProps {
 export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: EditExamDialogProps) {
   const [open, setOpen] = useState(false);
   const [subject, setSubject] = useState(exam.subject);
+  const [syllabus, setSyllabus] = useState(exam.syllabus || "");
   const [date, setDate] = useState(exam.date);
   const [notes, setNotes] = useState(exam.notes || "");
   const { toast } = useToast();
@@ -33,7 +34,7 @@ export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: Edit
       });
       return;
     }
-    onUpdate(exam.id, { subject, date, notes });
+    onUpdate(exam.id, { subject, syllabus, date, notes });
     setOpen(false);
     toast({
       title: "Exam updated",
@@ -61,12 +62,21 @@ export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: Edit
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="subject">Subject</Label>
+            <Label htmlFor="subject">Exam Title</Label>
             <Input 
               id="subject" 
               placeholder="e.g. Advanced Mathematics" 
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="syllabus">Syllabus</Label>
+            <Textarea 
+              id="syllabus" 
+              placeholder="e.g. Chapters 1-5, focus on calculus..." 
+              value={syllabus}
+              onChange={(e) => setSyllabus(e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -79,10 +89,10 @@ export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: Edit
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="notes">Optional Notes</Label>
+            <Label htmlFor="notes">Extra Notes</Label>
             <Textarea 
               id="notes" 
-              placeholder="Chapters 1-5, focus on calculus..." 
+              placeholder="e.g. Bring a specific calculator model." 
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />

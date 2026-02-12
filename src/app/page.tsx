@@ -11,7 +11,7 @@ import { ResourceCard } from "@/components/resources/ResourceCard";
 import { AddResourceDialog } from "@/components/resources/AddResourceDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen } from "lucide-react";
+import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen, Info } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -183,22 +183,31 @@ export default function Home() {
                 {upcomingExams.map((exam) => (
                   <Card key={exam.id} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white overflow-hidden flex flex-col">
                     <div className="h-2 bg-primary"></div>
-                    <CardHeader className="relative">
+                    <CardHeader className="relative pb-3">
                       <CardTitle className="text-lg leading-tight pr-8">{exam.subject}</CardTitle>
                       <div className="absolute top-4 right-4">
                         <EditExamDialog exam={exam} onUpdate={updateExam} />
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground pt-1">
-                        <Calendar className="h-3 w-3" />
-                        {format(parseISO(exam.date), 'EEE, MMM d')}
-                      </div>
                     </CardHeader>
-                    <CardContent className="flex-1 space-y-4">
-                      {exam.notes && (
-                        <p className="text-xs text-muted-foreground italic line-clamp-2">"{exam.notes}"</p>
+                    <CardContent className="flex-1 pt-0 space-y-3 text-sm">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                          <Calendar className="h-4 w-4" />
+                          <span>{format(parseISO(exam.date), 'EEE, MMM d, yyyy')}</span>
+                      </div>
+                      {exam.syllabus && (
+                          <div className="flex items-start gap-2">
+                              <BookOpen className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                              <p><span className="font-semibold">Syllabus:</span> {exam.syllabus}</p>
+                          </div>
                       )}
-                      <div className="py-4 border-y border-border/50 flex justify-center">
-                        <ExamCountdown date={exam.date} />
+                      {exam.notes && (
+                          <div className="flex items-start gap-2">
+                              <Info className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                              <p><span className="font-semibold">Extra Notes:</span> {exam.notes}</p>
+                          </div>
+                      )}
+                      <div className="pt-3 mt-3 border-y border-border/50 flex justify-center">
+                          <ExamCountdown date={exam.date} />
                       </div>
                     </CardContent>
                     <div className="p-4 bg-muted/10 flex items-center justify-between">

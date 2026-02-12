@@ -10,6 +10,7 @@ export type Exam = {
   id: string;
   userId: string;
   subject: string;
+  syllabus?: string;
   date: string; // YYYY-MM-DD
   notes?: string;
   completed: boolean;

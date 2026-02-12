@@ -64,7 +64,11 @@
         },
         "subject": {
           "type": "string",
-          "description": "The subject or topic of the exam."
+          "description": "The subject or title of the exam."
+        },
+        "syllabus": {
+          "type": "string",
+          "description": "The syllabus for the exam."
         },
         "date": {
           "type": "string",
