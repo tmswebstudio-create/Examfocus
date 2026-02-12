@@ -21,6 +21,29 @@ import { useRouter } from "next/navigation";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+
+function arrayMove<T>(array: T[], from: number, to: number): T[] {
+  const newArray = [...array];
+  const [item] = newArray.splice(from, 1);
+  if (item) {
+    newArray.splice(to, 0, item);
+  }
+  return newArray;
+}
 
 export default function Home() {
   const { user, isUserLoading } = useUser();
@@ -36,7 +59,8 @@ export default function Home() {
     addLinkToResource, 
     updateLinkInResource,
     deleteResource, 
-    removeLinkFromResource 
+    removeLinkFromResource,
+    setResourcesOrder,
   } = useResources();
   const [activeTab, setActiveTab] = useState("dashboard");
 
@@ -45,6 +69,27 @@ export default function Home() {
       router.push('/login');
     }
   }, [user, isUserLoading, router]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const {active, over} = event;
+    
+    if (over && active.id !== over.id) {
+      const oldIndex = resources.findIndex((r) => r.id === active.id);
+      const newIndex = resources.findIndex((r) => r.id === over.id);
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newOrderedResources = arrayMove(resources, oldIndex, newIndex);
+        setResourcesOrder(newOrderedResources);
+      }
+    }
+  }
 
   if (isUserLoading || !user || examsLoading || resourcesLoading || isProfileLoading) {
     return (
@@ -369,32 +414,43 @@ export default function Home() {
               <p className="text-muted-foreground">Keep all your study materials, cheat sheets, and references in one place.</p>
             </div>
 
-            {resources.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {resources.map((resource) => (
-                  <ResourceCard 
-                    key={resource.id} 
-                    resource={resource} 
-                    onAddLink={addLinkToResource}
-                    onUpdateLink={updateLinkInResource}
-                    onUpdateResource={updateResource}
-                    onDelete={deleteResource}
-                    onRemoveLink={removeLinkFromResource}
-                  />
-                ))}
-              </div>
-            ) : (
-              <Card className="p-20 text-center flex flex-col items-center border-dashed border-2">
-                <div className="bg-muted/50 p-6 rounded-full mb-6">
-                  <BookOpen className="h-12 w-12 text-muted-foreground opacity-50" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Build Your Library</h3>
-                <p className="text-muted-foreground max-w-sm mb-8">
-                  Add resource cards for different subjects and attach links to videos, articles, or PDF documents.
-                </p>
-                <AddResourceDialog onAdd={addResource} />
-              </Card>
-            )}
+            <DndContext 
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext 
+                items={resources.map(r => r.id)}
+                strategy={rectSortingStrategy}
+              >
+                {resources.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {resources.map((resource) => (
+                      <ResourceCard 
+                        key={resource.id} 
+                        resource={resource} 
+                        onAddLink={addLinkToResource}
+                        onUpdateLink={updateLinkInResource}
+                        onUpdateResource={updateResource}
+                        onDelete={deleteResource}
+                        onRemoveLink={removeLinkFromResource}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="p-20 text-center flex flex-col items-center border-dashed border-2">
+                    <div className="bg-muted/50 p-6 rounded-full mb-6">
+                      <BookOpen className="h-12 w-12 text-muted-foreground opacity-50" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">Build Your Library</h3>
+                    <p className="text-muted-foreground max-w-sm mb-8">
+                      Add resource cards for different subjects and attach links to videos, articles, or PDF documents.
+                    </p>
+                    <AddResourceDialog onAdd={addResource} />
+                  </Card>
+                )}
+              </SortableContext>
+            </DndContext>
           </div>
         )}
       </main>

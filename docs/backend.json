@@ -155,6 +155,10 @@
             "required": ["id", "label", "url", "icon"]
           }
         },
+        "displayOrder": {
+          "type": "number",
+          "description": "A number used to determine the sort order of the resource card in the UI."
+        },
         "createdAt": {
           "type": "string",
           "description": "Timestamp when the resource was created.",

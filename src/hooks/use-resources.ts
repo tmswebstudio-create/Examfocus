@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useCallback } from 'react';
-import { collection, doc, serverTimestamp, arrayUnion, arrayRemove } from "firebase/firestore";
+import { collection, doc, serverTimestamp, arrayUnion, arrayRemove, query, orderBy } from "firebase/firestore";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
@@ -18,6 +18,7 @@ export type Resource = {
   title: string;
   imageUrl: string;
   links: ResourceLink[];
+  displayOrder?: number;
   createdAt?: any;
   updatedAt?: any;
 };
@@ -28,14 +29,15 @@ export function useResources() {
 
   const resourcesCollectionPath = user ? `/userProfiles/${user.uid}/resources` : null;
   const resourcesQuery = useMemoFirebase(() => 
-    resourcesCollectionPath ? collection(firestore, resourcesCollectionPath) : null
+    resourcesCollectionPath ? query(collection(firestore, resourcesCollectionPath), orderBy("displayOrder", "asc")) : null
   , [firestore, resourcesCollectionPath]);
 
   const { data: resources, isLoading, error } = useCollection<Resource>(resourcesQuery);
   if(error) console.error(error);
 
   const addResource = useCallback((title: string, imageUrl: string) => {
-    if (!user || !resourcesQuery) return;
+    if (!user || !resourcesCollectionPath) return;
+    const collectionRef = collection(firestore, resourcesCollectionPath);
     const newResource = {
       userId: user.uid,
       title,
@@ -43,9 +45,10 @@ export function useResources() {
       links: [],
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
+      displayOrder: resources?.length ?? 0,
     };
-    addDocumentNonBlocking(resourcesQuery, newResource);
-  }, [user, resourcesQuery]);
+    addDocumentNonBlocking(collectionRef, newResource);
+  }, [user, firestore, resourcesCollectionPath, resources?.length]);
   
   const updateResource = useCallback((id: string, updates: Partial<Omit<Resource, 'id' | 'links' | 'userId'>>) => {
     if (!user || !resourcesCollectionPath) return;
@@ -87,6 +90,17 @@ export function useResources() {
     updateDocumentNonBlocking(docRef, { links: arrayRemove(linkToRemove) });
   }, [resources, firestore, resourcesCollectionPath]);
 
+  const setResourcesOrder = useCallback((orderedResources: Resource[]) => {
+    if (!user || !resourcesCollectionPath) return;
+
+    orderedResources.forEach((resource, index) => {
+        if (resource.displayOrder !== index) {
+            const docRef = doc(firestore, resourcesCollectionPath, resource.id);
+            updateDocumentNonBlocking(docRef, { displayOrder: index });
+        }
+    });
+  }, [user, firestore, resourcesCollectionPath]);
+
 
   return { 
     resources: resources || [], 
@@ -96,6 +110,7 @@ export function useResources() {
     addLinkToResource, 
     updateLinkInResource,
     deleteResource, 
-    removeLinkFromResource 
+    removeLinkFromResource,
+    setResourcesOrder
   };
 }
