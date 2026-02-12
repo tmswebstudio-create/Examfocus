@@ -9,7 +9,7 @@ import { StudyPlanTool } from "@/components/exam/StudyPlanTool";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, History, LayoutDashboard, BrainCircuit, Trash2, Clock, Sparkles, ChevronRight } from "lucide-react";
+import { Calendar, History, LayoutDashboard, BrainCircuit, Trash2, Clock, Sparkles } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -109,17 +109,17 @@ export default function Home() {
             {nextExam ? (
               <Card className="border-none bg-gradient-to-r from-primary to-accent text-white shadow-xl shadow-primary/20 overflow-hidden relative">
                 <div className="absolute -right-10 -top-10 bg-white/10 rounded-full h-40 w-40 blur-3xl"></div>
-                <CardHeader>
+                <CardHeader className="pb-2">
                    <Badge variant="outline" className="w-fit text-white border-white/40 bg-white/10 mb-2">Next Milestone</Badge>
-                   <CardTitle className="text-3xl font-bold">{nextExam.subject}</CardTitle>
+                   <CardTitle className="text-4xl font-black tracking-tight">{nextExam.subject}</CardTitle>
                    <div className="flex items-center gap-2 opacity-80 mt-1">
                       <Calendar className="h-4 w-4" />
-                      <span>{format(parseISO(nextExam.date), 'MMMM d, yyyy')}</span>
+                      <span className="font-medium">{format(parseISO(nextExam.date), 'MMMM d, yyyy')}</span>
                    </div>
                 </CardHeader>
-                <CardContent className="flex flex-col md:flex-row items-center justify-between gap-8 py-6">
-                   <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-md border border-white/20 w-full md:w-auto">
-                      <ExamCountdown date={nextExam.date} />
+                <CardContent className="flex flex-col md:flex-row items-center justify-between gap-8 py-8">
+                   <div className="bg-white/10 p-8 md:p-10 rounded-3xl backdrop-blur-xl border border-white/20 w-full md:w-auto shadow-2xl">
+                      <ExamCountdown date={nextExam.date} variant="featured" />
                    </div>
                    <div className="flex gap-3">
                       <MarkCompleteDialog examSubject={nextExam.subject} onComplete={(s) => markCompleted(nextExam.id, s)} />
