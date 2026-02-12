@@ -12,7 +12,7 @@ import { AddResourceDialog } from "@/components/resources/AddResourceDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen, Info } from "lucide-react";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isPast } from "date-fns";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -58,7 +58,11 @@ export default function Home() {
   }
 
   const upcomingExams = exams
-    .filter(e => !e.completed)
+    .filter(e => {
+      // An exam is upcoming if it's not completed and its date/time is not in the past.
+      const examDateTime = new Date(`${e.date}T${e.time || '23:59:59'}`);
+      return !e.completed && !isPast(examDateTime);
+    })
     .sort((a, b) => {
         const aDateTime = new Date(`${a.date}T${a.time || '00:00:00'}`).getTime();
         const bDateTime = new Date(`${b.date}T${b.time || '00:00:00'}`).getTime();
@@ -66,7 +70,11 @@ export default function Home() {
     });
   
   const pastExams = exams
-    .filter(e => e.completed)
+    .filter(e => {
+      // An exam is past if it's completed OR its date/time is in the past.
+      const examDateTime = new Date(`${e.date}T${e.time || '23:59:59'}`);
+      return e.completed || isPast(examDateTime);
+    })
     .sort((a, b) => {
         const aDateTime = new Date(`${a.date}T${a.time || '00:00:00'}`).getTime();
         const bDateTime = new Date(`${b.date}T${b.time || '00:00:00'}`).getTime();
@@ -309,14 +317,22 @@ export default function Home() {
                             {exam.gainedMark !== undefined ? `${exam.gainedMark} / ${exam.totalMark}`: 'N/A'}
                           </td>
                           <td className="px-6 py-4">
-                            {exam.score !== undefined && (
+                            {exam.score !== undefined ? (
                               <Badge className={exam.score! >= 70 ? "bg-green-100 text-green-700 hover:bg-green-100 border-none" : "bg-orange-100 text-orange-700 hover:bg-orange-100 border-none"}>
                                 {exam.score}%
                               </Badge>
+                            ) : (
+                               <Badge variant="secondary">Pending</Badge>
                             )}
                           </td>
                           <td className="px-6 py-4 text-right">
                             <div className="flex items-center justify-end gap-1">
+                              {!exam.completed && (
+                                <MarkCompleteDialog
+                                  examSubject={exam.subject}
+                                  onComplete={(g, t) => markCompleted(exam.id, g, t)}
+                                />
+                              )}
                               <EditExamDialog exam={exam} onUpdate={updateExam} />
                               <Button 
                                 variant="ghost" 
