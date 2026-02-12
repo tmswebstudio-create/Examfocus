@@ -14,7 +14,7 @@ import {
   Star, Heart, Bookmark, Flag, Info, HelpCircle, Check, Settings, Download, File, 
   Folder, Map, Pin, Search, Facebook, Instagram, Slack, Send
 } from "lucide-react";
-import { type Resource, type ResourceLink } from "@/app/lib/resource-store";
+import { type Resource, type ResourceLink } from "@/hooks/use-resources";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -23,7 +23,7 @@ interface ResourceCardProps {
   resource: Resource;
   onAddLink: (resourceId: string, link: Omit<ResourceLink, 'id'>) => void;
   onUpdateLink: (resourceId: string, linkId: string, updates: Partial<Omit<ResourceLink, 'id'>>) => void;
-  onUpdateResource: (id: string, updates: { title: string; imageUrl: string }) => void;
+  onUpdateResource: (id: string, updates: Partial<Omit<Resource, 'id' | 'links'>>) => void;
   onDelete: (id: string) => void;
   onRemoveLink: (resourceId: string, linkId: string) => void;
 }

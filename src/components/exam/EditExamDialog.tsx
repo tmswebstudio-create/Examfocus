@@ -8,11 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Exam } from "@/app/lib/exam-store";
+import { type Exam } from "@/hooks/use-exams";
 
 interface EditExamDialogProps {
   exam: Exam;
-  onUpdate: (id: string, exam: Partial<Exam>) => void;
+  onUpdate: (id: string, exam: Partial<Omit<Exam, 'id'>>) => void;
   triggerVariant?: "icon" | "outline";
 }
 

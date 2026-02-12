@@ -1,7 +1,7 @@
 "use client";
 
-import { useExams } from "@/app/lib/exam-store";
-import { useResources } from "@/app/lib/resource-store";
+import { useExams } from "@/hooks/use-exams";
+import { useResources } from "@/hooks/use-resources";
 import { AddExamDialog } from "@/components/exam/AddExamDialog";
 import { EditExamDialog } from "@/components/exam/EditExamDialog";
 import { ExamCountdown } from "@/components/exam/Countdown";
@@ -11,13 +11,22 @@ import { ResourceCard } from "@/components/resources/ResourceCard";
 import { AddResourceDialog } from "@/components/resources/AddResourceDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen, Pencil } from "lucide-react";
+import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen, LogOut } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/firebase";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/firebase";
+import { useUserProfile } from "@/hooks/use-user-profile";
 
 export default function Home() {
+  const { user, isUserLoading } = useUser();
+  const { userProfile, isProfileLoading } = useUserProfile();
+  const router = useRouter();
+  const auth = useAuth();
+
   const { exams, isLoaded: examsLoaded, addExam, updateExam, markCompleted, deleteExam } = useExams();
   const { 
     resources, 
@@ -31,7 +40,13 @@ export default function Home() {
   } = useResources();
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  if (!examsLoaded || !resourcesLoaded) {
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, router]);
+
+  if (isUserLoading || !user || !examsLoaded || !resourcesLoaded || isProfileLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">
@@ -51,6 +66,11 @@ export default function Home() {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const nextExam = upcomingExams[0];
+
+  const handleLogout = () => {
+    auth.signOut();
+    router.push('/login');
+  };
 
   const navItems = [
     { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -95,6 +115,9 @@ export default function Home() {
             ) : (
               <AddExamDialog onAdd={addExam} />
             )}
+            <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout">
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </nav>
@@ -104,7 +127,7 @@ export default function Home() {
         {activeTab === 'dashboard' && (
           <div className="space-y-10 animate-in fade-in duration-500">
             <header className="mb-10">
-              <h1 className="text-3xl font-bold text-foreground">Welcome back, Student!</h1>
+              <h1 className="text-3xl font-bold text-foreground">Welcome back, {userProfile?.firstName || 'Student'}!</h1>
               <p className="text-muted-foreground mt-1">Stay focused and track your academic journey.</p>
             </header>
 
@@ -233,12 +256,14 @@ export default function Home() {
                         <td className="px-6 py-4 font-medium">{exam.subject}</td>
                         <td className="px-6 py-4 text-muted-foreground text-sm">{format(parseISO(exam.date), 'MMM d, yyyy')}</td>
                         <td className="px-6 py-4 text-sm font-medium">
-                          {exam.gainedMark} / {exam.totalMark}
+                          {exam.gainedMark !== undefined ? `${exam.gainedMark} / ${exam.totalMark}`: 'N/A'}
                         </td>
                         <td className="px-6 py-4">
-                          <Badge className={exam.score! >= 70 ? "bg-green-100 text-green-700 hover:bg-green-100 border-none" : "bg-orange-100 text-orange-700 hover:bg-orange-100 border-none"}>
-                            {exam.score}%
-                          </Badge>
+                          {exam.score !== undefined && (
+                            <Badge className={exam.score! >= 70 ? "bg-green-100 text-green-700 hover:bg-green-100 border-none" : "bg-orange-100 text-orange-700 hover:bg-orange-100 border-none"}>
+                              {exam.score}%
+                            </Badge>
+                          )}
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-1">
