@@ -50,7 +50,7 @@ export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: Edit
             <Pencil className="h-4 w-4" />
           </Button>
         ) : triggerVariant === "icon" ? (
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary hover:text-white">
             <Pencil className="h-4 w-4" />
           </Button>
         ) : (
