@@ -59,11 +59,19 @@ export default function Home() {
 
   const upcomingExams = exams
     .filter(e => !e.completed)
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    .sort((a, b) => {
+        const aDateTime = new Date(`${a.date}T${a.time || '00:00:00'}`).getTime();
+        const bDateTime = new Date(`${b.date}T${b.time || '00:00:00'}`).getTime();
+        return aDateTime - bDateTime;
+    });
   
   const pastExams = exams
     .filter(e => e.completed)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    .sort((a, b) => {
+        const aDateTime = new Date(`${a.date}T${a.time || '00:00:00'}`).getTime();
+        const bDateTime = new Date(`${b.date}T${b.time || '00:00:00'}`).getTime();
+        return bDateTime - aDateTime;
+    });
 
   const nextExam = upcomingExams[0];
 
