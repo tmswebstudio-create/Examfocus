@@ -26,12 +26,13 @@ export function EditProfileDialog() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (userProfile) {
+    // When the dialog opens, populate the form with the latest user profile data.
+    if (open && userProfile) {
       setFirstName(userProfile.firstName || '');
       setLastName(userProfile.lastName || '');
       setPhotoURL(userProfile.photoURL || '');
     }
-  }, [userProfile]);
+  }, [open, userProfile]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +81,7 @@ export function EditProfileDialog() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="photoURL">Photo URL</Label>
-            <Input id="photoURL" placeholder="https://example.com/photo.jpg" value={photoURL} onChange={(e) => setPhotoURL(e.target.value)} />
+            <Input id="photoURL" placeholder="https://example.com/photo.jpg" value={photoURL || ''} onChange={(e) => setPhotoURL(e.target.value)} />
           </div>
           <Button type="submit" className="w-full">Save Changes</Button>
         </form>
