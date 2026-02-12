@@ -1,16 +1,22 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Plus, Link as LinkIcon, ExternalLink, Globe, FileText, Youtube, Trash2, X,
-  Video, BookOpen, Github, Code, Image as ImageIcon, MonitorPlay, Database, Mail, MessageSquare, Linkedin, Twitter
+  Video, BookOpen, Github, Code, Image as ImageIcon, MonitorPlay, Database, Mail, 
+  MessageSquare, Linkedin, Twitter, Book, GraduationCap, School, Pencil, Library, 
+  Calculator, Microscope, Terminal, Cpu, Cloud, Wifi, Music, Headphones, Camera, 
+  Star, Heart, Bookmark, Flag, Info, HelpCircle, Check, Settings, Download, File, 
+  Folder, Map, Pin, Search, Facebook, Instagram, Slack, Send
 } from "lucide-react";
 import { type Resource, type ResourceLink } from "@/app/lib/resource-store";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface ResourceCardProps {
   resource: Resource;
@@ -21,20 +27,51 @@ interface ResourceCardProps {
 
 const ICON_OPTIONS = [
   { name: 'Link', icon: LinkIcon },
-  { name: 'Globe', icon: Globe },
-  { name: 'FileText', icon: FileText },
-  { name: 'Youtube', icon: Youtube },
-  { name: 'Video', icon: Video },
+  { name: 'Book', icon: Book },
   { name: 'BookOpen', icon: BookOpen },
+  { name: 'GraduationCap', icon: GraduationCap },
+  { name: 'Library', icon: Library },
+  { name: 'School', icon: School },
+  { name: 'Pencil', icon: Pencil },
+  { name: 'Calculator', icon: Calculator },
+  { name: 'Microscope', icon: Microscope },
+  { name: 'Globe', icon: Globe },
   { name: 'Github', icon: Github },
   { name: 'Code', icon: Code },
-  { name: 'Image', icon: ImageIcon },
-  { name: 'MonitorPlay', icon: MonitorPlay },
+  { name: 'Terminal', icon: Terminal },
   { name: 'Database', icon: Database },
+  { name: 'Cpu', icon: Cpu },
+  { name: 'Cloud', icon: Cloud },
+  { name: 'Wifi', icon: Wifi },
+  { name: 'Youtube', icon: Youtube },
+  { name: 'Video', icon: Video },
+  { name: 'MonitorPlay', icon: MonitorPlay },
+  { name: 'Camera', icon: Camera },
+  { name: 'Image', icon: ImageIcon },
+  { name: 'Music', icon: Music },
+  { name: 'Headphones', icon: Headphones },
   { name: 'Mail', icon: Mail },
   { name: 'MessageSquare', icon: MessageSquare },
-  { name: 'Linkedin', icon: Linkedin },
+  { name: 'Slack', icon: Slack },
+  { name: 'Send', icon: Send },
   { name: 'Twitter', icon: Twitter },
+  { name: 'Linkedin', icon: Linkedin },
+  { name: 'Facebook', icon: Facebook },
+  { name: 'Instagram', icon: Instagram },
+  { name: 'Star', icon: Star },
+  { name: 'Heart', icon: Heart },
+  { name: 'Bookmark', icon: Bookmark },
+  { name: 'Flag', icon: Flag },
+  { name: 'Info', icon: Info },
+  { name: 'Help', icon: HelpCircle },
+  { name: 'Check', icon: Check },
+  { name: 'Settings', icon: Settings },
+  { name: 'File', icon: File },
+  { name: 'FileText', icon: FileText },
+  { name: 'Folder', icon: Folder },
+  { name: 'Download', icon: Download },
+  { name: 'Map', icon: Map },
+  { name: 'Pin', icon: Pin },
 ];
 
 export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: ResourceCardProps) {
@@ -42,6 +79,13 @@ export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: Re
   const [label, setLabel] = useState("");
   const [url, setUrl] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("Link");
+  const [iconSearch, setIconSearch] = useState("");
+
+  const filteredIcons = useMemo(() => {
+    return ICON_OPTIONS.filter(opt => 
+      opt.name.toLowerCase().includes(iconSearch.toLowerCase())
+    );
+  }, [iconSearch]);
 
   const handleAddLink = () => {
     if (!label || !url) return;
@@ -49,6 +93,7 @@ export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: Re
     setLabel("");
     setUrl("");
     setIsAdding(false);
+    setIconSearch("");
   };
 
   return (
@@ -88,11 +133,11 @@ export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: Re
                       href={link.url} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="flex items-center gap-2 text-sm text-primary hover:underline font-medium"
+                      className="flex items-center gap-2 text-sm text-primary hover:underline font-medium truncate"
                     >
-                      <IconComp className="h-4 w-4" />
-                      {link.label}
-                      <ExternalLink className="h-3 w-3 opacity-50" />
+                      <IconComp className="h-4 w-4 shrink-0" />
+                      <span className="truncate">{link.label}</span>
+                      <ExternalLink className="h-3 w-3 opacity-50 shrink-0" />
                     </a>
                     <Button 
                       variant="ghost" 
@@ -119,7 +164,7 @@ export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: Re
                 placeholder="e.g. Video Tutorial" 
                 value={label} 
                 onChange={(e) => setLabel(e.target.value)}
-                className="h-8 text-sm"
+                className="h-8 text-sm bg-white"
               />
             </div>
             <div className="space-y-1">
@@ -128,29 +173,50 @@ export function ResourceCard({ resource, onAddLink, onDelete, onRemoveLink }: Re
                 placeholder="https://..." 
                 value={url} 
                 onChange={(e) => setUrl(e.target.value)}
-                className="h-8 text-sm"
+                className="h-8 text-sm bg-white"
               />
             </div>
+            
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase font-bold tracking-wider opacity-60">Select Icon</Label>
-              <div className="grid grid-cols-5 gap-2">
-                {ICON_OPTIONS.map((opt) => (
-                  <Button
-                    key={opt.name}
-                    type="button"
-                    variant={selectedIcon === opt.name ? "default" : "outline"}
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => setSelectedIcon(opt.name)}
-                    title={opt.name}
-                  >
-                    <opt.icon className="h-4 w-4" />
-                  </Button>
-                ))}
+              <div className="flex items-center justify-between">
+                <Label className="text-[10px] uppercase font-bold tracking-wider opacity-60">Select Icon</Label>
+                <div className="relative">
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search icons..." 
+                    value={iconSearch}
+                    onChange={(e) => setIconSearch(e.target.value)}
+                    className="h-7 text-[10px] pl-7 w-32 bg-white"
+                  />
+                </div>
               </div>
+              <ScrollArea className="h-24 bg-white rounded-md border p-2">
+                <div className="grid grid-cols-6 gap-2">
+                  {filteredIcons.map((opt) => (
+                    <Button
+                      key={opt.name}
+                      type="button"
+                      variant={selectedIcon === opt.name ? "default" : "ghost"}
+                      size="icon"
+                      className={cn(
+                        "h-8 w-8",
+                        selectedIcon === opt.name ? "bg-primary text-white" : "hover:bg-primary/10 text-muted-foreground"
+                      )}
+                      onClick={() => setSelectedIcon(opt.name)}
+                      title={opt.name}
+                    >
+                      <opt.icon className="h-4 w-4" />
+                    </Button>
+                  ))}
+                  {filteredIcons.length === 0 && (
+                    <p className="col-span-full text-[10px] text-center text-muted-foreground py-2">No icons found</p>
+                  )}
+                </div>
+              </ScrollArea>
             </div>
+
             <div className="flex gap-2 pt-2">
-              <Button size="sm" className="flex-1" onClick={handleAddLink}>Add Link</Button>
+              <Button size="sm" className="flex-1 bg-primary" onClick={handleAddLink}>Add Link</Button>
               <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>Cancel</Button>
             </div>
           </div>
