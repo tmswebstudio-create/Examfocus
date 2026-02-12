@@ -261,7 +261,7 @@ export default function Home() {
                               <p><span className="font-semibold">Extra Notes:</span> {exam.notes}</p>
                           </div>
                       )}
-                      <div className="py-4 mt-3 border-y border-border/50 flex justify-center">
+                      <div className="py-4 mt-4 border-t border-border/50 flex justify-center">
                           <ExamCountdown date={exam.date} />
                       </div>
                     </CardContent>
@@ -303,6 +303,7 @@ export default function Home() {
                       <tr>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Exam Title</th>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Date</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Syllabus</th>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Score</th>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Result (%)</th>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground text-right">Actions</th>
@@ -313,6 +314,7 @@ export default function Home() {
                         <tr key={exam.id} className="border-b border-border/50 last:border-none hover:bg-muted/10 transition-colors">
                           <td className="px-6 py-4 font-medium">{exam.subject}</td>
                           <td className="px-6 py-4 text-muted-foreground text-sm">{format(parseISO(exam.date), 'MMM d, yyyy')}</td>
+                          <td className="px-6 py-4 text-muted-foreground text-sm max-w-xs truncate">{exam.syllabus || 'N/A'}</td>
                           <td className="px-6 py-4 text-sm font-medium">
                             {exam.gainedMark !== undefined ? `${exam.gainedMark} / ${exam.totalMark}`: 'N/A'}
                           </td>
@@ -348,7 +350,7 @@ export default function Home() {
                       ))}
                       {pastExams.length === 0 && (
                         <tr>
-                          <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                          <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
                             No past exam records found.
                           </td>
                         </tr>
