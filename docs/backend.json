@@ -1,0 +1,297 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user's profile in the ExamFocus application, holding personal preferences and linking to their data. Authentication details are handled by an external system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The user's first name."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The user's last name."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user profile was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the user profile was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Exam": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Exam",
+      "type": "object",
+      "description": "Represents an exam scheduled by a user, including details about the subject, date, and completion status.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Exam entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to UserProfile. (Relationship: UserProfile 1:N Exam)"
+        },
+        "subject": {
+          "type": "string",
+          "description": "The subject or topic of the exam."
+        },
+        "examDate": {
+          "type": "string",
+          "description": "The scheduled date and time of the exam.",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes related to the exam."
+        },
+        "isCompleted": {
+          "type": "boolean",
+          "description": "Indicates whether the exam has been marked as completed."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the exam record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the exam record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "subject",
+        "examDate",
+        "isCompleted",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "StudyPlan": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "StudyPlan",
+      "type": "object",
+      "description": "Represents a personalized study plan generated for a user, potentially linked to a specific exam.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the StudyPlan entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to UserProfile. (Relationship: UserProfile 1:N StudyPlan)"
+        },
+        "examId": {
+          "type": "string",
+          "description": "Optional reference to an Exam this study plan is for. (Relationship: Exam 1:N StudyPlan)"
+        },
+        "title": {
+          "type": "string",
+          "description": "A descriptive title for the study plan."
+        },
+        "planDetails": {
+          "type": "string",
+          "description": "The detailed content of the study plan, potentially in a structured format (e.g., markdown or JSON string)."
+        },
+        "generationDate": {
+          "type": "string",
+          "description": "The date when the study plan was generated.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the study plan (e.g., 'active', 'completed', 'archived')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the study plan record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the study plan record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "title",
+        "planDetails",
+        "generationDate",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ExamPerformance": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ExamPerformance",
+      "type": "object",
+      "description": "Stores the results and performance details for a completed exam for a specific user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ExamPerformance entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to UserProfile. (Relationship: UserProfile 1:N ExamPerformance)"
+        },
+        "examId": {
+          "type": "string",
+          "description": "Reference to the Exam for which this performance is recorded. (Relationship: Exam 1:1 ExamPerformance)"
+        },
+        "score": {
+          "type": "number",
+          "description": "The score obtained in the exam."
+        },
+        "maxScore": {
+          "type": "number",
+          "description": "The maximum possible score for the exam."
+        },
+        "percentage": {
+          "type": "number",
+          "description": "The calculated percentage score for the exam."
+        },
+        "feedbackNotes": {
+          "type": "string",
+          "description": "Optional notes or feedback regarding the exam performance."
+        },
+        "completionDate": {
+          "type": "string",
+          "description": "The date when the exam was marked as completed and scored.",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the performance record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the performance record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "examId",
+        "score",
+        "maxScore",
+        "percentage",
+        "completionDate",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/userProfiles/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores individual user profiles. The document ID (`userId`) must match the authenticated user's UID (`request.auth.uid`). This collection serves as the root for all user-specific data, providing explicit path-based ownership."
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/exams/{examId}",
+        "definition": {
+          "entityName": "Exam",
+          "schema": {
+            "$ref": "#/backend/entities/Exam"
+          },
+          "description": "Contains exams created and owned by a specific user. The 'userId' field within each document is denormalized from the parent path for authorization independence and serves as an invariant check. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user who owns this exam, matching the authenticated user's UID."
+            },
+            {
+              "name": "examId",
+              "description": "The unique ID for the specific exam."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/studyPlans/{studyPlanId}",
+        "definition": {
+          "entityName": "StudyPlan",
+          "schema": {
+            "$ref": "#/backend/entities/StudyPlan"
+          },
+          "description": "Stores personalized study plans for a specific user. The 'userId' field within each document is denormalized from the parent path for authorization independence and serves as an invariant check. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user who owns this study plan, matching the authenticated user's UID."
+            },
+            {
+              "name": "studyPlanId",
+              "description": "The unique ID for the specific study plan."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/examPerformance/{performanceId}",
+        "definition": {
+          "entityName": "ExamPerformance",
+          "schema": {
+            "$ref": "#/backend/entities/ExamPerformance"
+          },
+          "description": "Records the performance details for completed exams for a specific user. The 'userId' field within each document is denormalized from the parent path for authorization independence and serves as an invariant check. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user who owns this exam performance record, matching the authenticated user's UID."
+            },
+            {
+              "name": "performanceId",
+              "description": "The unique ID for the specific exam performance record."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure prioritizes strict user data segregation and path-based ownership, which inherently satisfies the Authorization Independence and Queryable by Authorization Principles (QAPs).\n\n1.  **Authorization Independence (via Denormalization in Path):** All user-specific data (UserProfile, Exam, StudyPlan, ExamPerformance) is nested under a top-level `userProfiles/{userId}` collection. This pattern ensures that the `userId` is always part of the document's path (e.g., `/userProfiles/{userId}/exams/{examId}`). This structural denormalization means that security rules do not need to perform expensive `get()` calls to check parent documents for ownership. Instead, rules can directly compare `request.auth.uid` with the `{userId}` wildcard in the path. Furthermore, each document in the subcollections (Exam, StudyPlan, ExamPerformance) includes a `userId` field. This internal `userId` field acts as an invariant, allowing security rules to verify that the document's content explicitly matches its path-based owner, further enhancing security and debuggability without relying on hierarchical dependencies.\n\n2.  **QAPs (Rules are not Filters):** By segregating all data per user into their respective subcollections (e.g., `/userProfiles/{userId}/exams`), any `list` or `query` operation performed by an authenticated user on these paths will inherently only return data owned by that user. For instance, a query on `/userProfiles/`${request.auth.uid}`/exams` will only ever yield exams belonging to the authenticated user. There is no mixing of public and private data, or data from different users, within the same collection that would necessitate filtering in security rules. This makes rules simple (e.g., `allow read: if request.auth.uid == userId;`), robust, and performant, avoiding security pitfalls associated with client-side filtering."
+  }
+}

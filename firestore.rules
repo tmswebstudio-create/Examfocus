@@ -1,0 +1,149 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict user-ownership model. All user-generated
+ * content is private and can only be accessed by its creator. The security model is
+ * built directly into the data structure, ensuring that rules are simple, performant,
+ * and highly secure by default.
+ *
+ * Data Structure: All user-specific data, including profiles, exams, and study plans, is
+ * hierarchically nested under a top-level `/userProfiles/{userId}` collection. This
+ * structure inherently segregates each user's data from all others.
+ *
+ * Key Security Decisions:
+ * - User Enumeration Disabled: Listing the top-level `/userProfiles` collection is
+ *   explicitly disallowed to prevent scraping of user information.
+ * - Path-Based Security: All security rules leverage the `{userId}` wildcard in the
+ *   path, comparing it directly against the authenticated user's ID (`request.auth.uid`).
+ * - Default Deny: Access is implicitly denied for any path not explicitly matched. All
+ *   operations within matched paths that are not explicitly allowed are also denied.
+ *
+ * Denormalization for Authorization: To ensure fast and simple authorization checks,
+ * a `userId` field is stored on all documents within user subcollections (e.g., exams,
+ * studyPlans). This allows rules to validate ownership consistency between the document's
+ * path and its content without requiring costly `get()` calls to parent documents.
+ * This field is enforced as immutable on update.
+ *
+ * Structural Segregation: The data model uses separate collections for each user's
+ * data, which is the most secure and performant way to manage private, user-owned content.
+ * This eliminates the risk of accidentally exposing one user's data to another through
+ * insecure list queries.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper Functions for Reusable Logic
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Validates that the requesting user is the owner of the document based on the path's {userId}.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Validates ownership for an existing document, preventing writes to non-existent paths.
+     * This is critical for all update and delete operations.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * On create, validates that the UserProfile document's internal 'id' field
+     * matches the document's ID in the path ({userId}). This enforces data integrity.
+     */
+    function isValidUserProfileCreate(userId) {
+      return request.resource.data.id == userId;
+    }
+
+    /**
+     * On update, ensures the UserProfile document's internal 'id' field cannot be changed.
+     */
+    function isUserIdFieldImmutable() {
+      return request.resource.data.id == resource.data.id;
+    }
+
+    /**
+     * On create, validates that a subcollection document's internal 'userId' field
+     * matches the {userId} from the path. This links the document to its owner.
+     */
+    function isValidSubcollectionCreate(userId) {
+      return request.resource.data.userId == userId;
+    }
+
+    /**
+     * On update, ensures a subcollection document's internal 'userId' field is immutable,
+     * preventing the document from being reassigned to another user.
+     */
+    function isUserIdImmutable() {
+      return request.resource.data.userId == resource.data.userId;
+    }
+
+    /**
+     * @description   Rules for a user's own profile document.
+     * @path          /userProfiles/{userId}
+     * @allow         A signed-in user (auth.uid: 'user123') can (create) their own profile at /userProfiles/user123. They can also (get), (update), and (delete) it.
+     * @deny          A signed-in user (auth.uid: 'user456') cannot (get) or (update) another user's profile at /userProfiles/user123. Listing all profiles is forbidden.
+     * @principle     Restricts access to a user's own data tree and prevents user enumeration.
+     */
+    match /userProfiles/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && isValidUserProfileCreate(userId);
+      allow update: if isExistingOwner(userId) && isUserIdFieldImmutable();
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description   Rules for exams, which are owned by a specific user.
+       * @path          /userProfiles/{userId}/exams/{examId}
+       * @allow         A signed-in user (auth.uid: 'user123') can (create) and (list) their own exams under /userProfiles/user123/exams.
+       * @deny          A signed-in user (auth.uid: 'user456') cannot access any exams under /userProfiles/user123/exams.
+       * @principle     Enforces document ownership. All data in this subcollection is private to the parent user.
+       */
+      match /exams/{examId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidSubcollectionCreate(userId);
+        allow update: if isExistingOwner(userId) && isUserIdImmutable();
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description   Rules for study plans, which are owned by a specific user.
+       * @path          /userProfiles/{userId}/studyPlans/{studyPlanId}
+       * @allow         A signed-in user (auth.uid: 'user123') can (create) and (list) their own study plans under /userProfiles/user123/studyPlans.
+       * @deny          A signed-in user (auth.uid: 'user456') cannot access any study plans under /userProfiles/user123/studyPlans.
+       * @principle     Enforces document ownership. All data in this subcollection is private to the parent user.
+       */
+      match /studyPlans/{studyPlanId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidSubcollectionCreate(userId);
+        allow update: if isExistingOwner(userId) && isUserIdImmutable();
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description   Rules for exam performance records, owned by a specific user.
+       * @path          /userProfiles/{userId}/examPerformance/{performanceId}
+       * @allow         A signed-in user (auth.uid: 'user123') can (create) and (list) their own performance records under /userProfiles/user123/examPerformance.
+       * @deny          A signed-in user (auth.uid: 'user456') cannot access any performance records under /userProfiles/user123/examPerformance.
+       * @principle     Enforces document ownership. All data in this subcollection is private to the parent user.
+       */
+      match /examPerformance/{performanceId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidSubcollectionCreate(userId);
+        allow update: if isExistingOwner(userId) && isUserIdImmutable();
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+  }
+}
