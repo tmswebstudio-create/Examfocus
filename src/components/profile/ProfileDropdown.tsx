@@ -38,10 +38,10 @@ export function ProfileDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-primary/10">
+        <Button variant="ghost" className="group relative h-10 w-10 rounded-full hover:bg-primary/10">
           <Avatar className="h-10 w-10">
             <AvatarImage src={userProfile.photoURL || ''} alt={`${userProfile.firstName} ${userProfile.lastName}`} />
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback className="group-hover:text-primary">{initials}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
