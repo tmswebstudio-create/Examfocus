@@ -229,7 +229,7 @@ export default function Home() {
                               <p><span className="font-semibold">Extra Notes:</span> {exam.notes}</p>
                           </div>
                       )}
-                      <div className="pt-3 mt-3 border-y border-border/50 flex justify-center">
+                      <div className="py-3 mt-3 border-y border-border/50 flex justify-center">
                           <ExamCountdown date={exam.date} />
                       </div>
                     </CardContent>
