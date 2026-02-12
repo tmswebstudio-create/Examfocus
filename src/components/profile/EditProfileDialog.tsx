@@ -24,15 +24,23 @@ export function EditProfileDialog() {
   const [photoURL, setPhotoURL] = useState('');
   
   const { toast } = useToast();
+  
+  const { 
+    firstName: profileFirstName, 
+    lastName: profileLastName, 
+    photoURL: profilePhotoURL 
+  } = userProfile || {};
 
   useEffect(() => {
     // When the dialog opens, populate the form with the latest user profile data.
-    if (open && userProfile) {
-      setFirstName(userProfile.firstName || '');
-      setLastName(userProfile.lastName || '');
-      setPhotoURL(userProfile.photoURL || '');
+    // The dependency array uses destructured primitives from userProfile to prevent
+    // re-running the effect on every render due to an unstable object reference.
+    if (open) {
+      setFirstName(profileFirstName || '');
+      setLastName(profileLastName || '');
+      setPhotoURL(profilePhotoURL || '');
     }
-  }, [open, userProfile]);
+  }, [open, profileFirstName, profileLastName, profilePhotoURL]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
