@@ -14,6 +14,7 @@ import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen } 
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
   const { exams, isLoaded: examsLoaded, addExam, markCompleted, deleteExam } = useExams();
@@ -41,74 +42,58 @@ export default function Home() {
 
   const nextExam = upcomingExams[0];
 
+  const navItems = [
+    { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
+    { id: 'upcoming', label: 'Upcoming', icon: Clock },
+    { id: 'history', label: 'History', icon: History },
+    { id: 'resources', label: 'Resources', icon: Library },
+  ];
+
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-background">
-      {/* Sidebar Navigation */}
-      <aside className="w-full md:w-64 bg-white border-r border-border p-6 flex flex-col gap-8">
-        <div className="flex items-center gap-2 px-2">
-          <div className="bg-primary p-2 rounded-lg">
-            <LayoutDashboard className="text-white h-5 w-5" />
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Sticky Top Navigation */}
+      <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-md px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="bg-primary p-2 rounded-lg">
+              <LayoutDashboard className="text-white h-5 w-5" />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-primary hidden sm:inline-block">ExamFocus</span>
           </div>
-          <span className="text-xl font-bold tracking-tight text-primary">ExamFocus</span>
-        </div>
 
-        <nav className="flex flex-col gap-1">
-          <Button 
-            variant={activeTab === 'dashboard' ? 'secondary' : 'ghost'} 
-            className="justify-start px-3"
-            onClick={() => setActiveTab('dashboard')}
-          >
-            <LayoutDashboard className="mr-3 h-4 w-4 text-primary" />
-            Overview
-          </Button>
-          <Button 
-            variant={activeTab === 'upcoming' ? 'secondary' : 'ghost'} 
-            className="justify-start px-3"
-            onClick={() => setActiveTab('upcoming')}
-          >
-            <Clock className="mr-3 h-4 w-4 text-primary" />
-            Upcoming Exams
-          </Button>
-          <Button 
-            variant={activeTab === 'history' ? 'secondary' : 'ghost'} 
-            className="justify-start px-3"
-            onClick={() => setActiveTab('history')}
-          >
-            <History className="mr-3 h-4 w-4 text-primary" />
-            Exam History
-          </Button>
-          <Button 
-            variant={activeTab === 'resources' ? 'secondary' : 'ghost'} 
-            className="justify-start px-3"
-            onClick={() => setActiveTab('resources')}
-          >
-            <Library className="mr-3 h-4 w-4 text-primary" />
-            Resources
-          </Button>
-        </nav>
-
-        <div className="mt-auto pt-6 border-t border-border">
-          <div className="bg-blue-50/50 p-4 rounded-xl">
-             <p className="text-xs text-primary font-bold mb-1 uppercase tracking-wider">Productivity Tip</p>
-             <p className="text-xs text-muted-foreground leading-relaxed">Taking short 5-minute breaks every hour improves focus significantly.</p>
+          <div className="flex items-center gap-1 md:gap-4">
+            {navItems.map((item) => (
+              <Button
+                key={item.id}
+                variant={activeTab === item.id ? 'secondary' : 'ghost'}
+                size="sm"
+                className={cn(
+                  "gap-2",
+                  activeTab === item.id && "bg-primary/10 text-primary hover:bg-primary/20"
+                )}
+                onClick={() => setActiveTab(item.id)}
+              >
+                <item.icon className="h-4 w-4" />
+                <span className="hidden md:inline">{item.label}</span>
+              </Button>
+            ))}
           </div>
-        </div>
-      </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 p-6 md:p-10 overflow-auto">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Welcome back, Student!</h1>
-            <p className="text-muted-foreground mt-1">Stay focused and track your academic journey.</p>
-          </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             {activeTab === 'resources' ? (
               <AddResourceDialog onAdd={addResource} />
             ) : (
               <AddExamDialog onAdd={addExam} />
             )}
           </div>
+        </div>
+      </nav>
+
+      {/* Main Content Area */}
+      <main className="flex-1 max-w-7xl mx-auto w-full p-6 md:p-10 overflow-auto">
+        <header className="mb-10">
+          <h1 className="text-3xl font-bold text-foreground">Welcome back, Student!</h1>
+          <p className="text-muted-foreground mt-1">Stay focused and track your academic journey.</p>
         </header>
 
         {activeTab === 'dashboard' && (
