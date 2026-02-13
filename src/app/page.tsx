@@ -244,7 +244,7 @@ export default function Home() {
                       <p><span className="font-semibold opacity-100">Extra Notes:</span> {nextExam.notes}</p>
                     </div>
                   )}
-                  <div className="pt-4 mt-4 border-t border-white/20 flex justify-center">
+                  <div className="mt-4 flex justify-center">
                     <ExamCountdown date={nextExam.date} time={nextExam.time} variant="featured" />
                   </div>
                 </CardContent>
@@ -340,7 +340,7 @@ export default function Home() {
                               <p><span className="font-semibold">Extra Notes:</span> {exam.notes}</p>
                           </div>
                       )}
-                      <div className="pt-4 mt-4 border-t border-border/50 flex justify-center">
+                      <div className="mt-4 flex justify-center">
                           <ExamCountdown date={exam.date} time={exam.time} />
                       </div>
                     </CardContent>
