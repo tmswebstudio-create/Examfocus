@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, History, LayoutDashboard, Trash2, Clock, Library, BookOpen, Info } from "lucide-react";
 import { format, parseISO, isPast } from "date-fns";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/firebase";
@@ -35,6 +35,13 @@ import {
   sortableKeyboardCoordinates,
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function arrayMove<T>(array: T[], from: number, to: number): T[] {
   const newArray = [...array];
@@ -63,12 +70,20 @@ export default function Home() {
     setResourcesOrder,
   } = useResources();
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
 
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/login');
     }
   }, [user, isUserLoading, router]);
+
+  const categories = useMemo(() => {
+    if (!exams) return ['all'];
+    const uniqueCategories = new Set(exams.map(e => e.category).filter(Boolean) as string[]);
+    return ['all', ...Array.from(uniqueCategories)];
+  }, [exams]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -108,6 +123,7 @@ export default function Home() {
       const examDateTime = new Date(`${e.date}T${e.time || '23:59:59'}`);
       return !e.completed && !isPast(examDateTime);
     })
+    .filter(e => selectedCategory === 'all' || e.category === selectedCategory)
     .sort((a, b) => {
         const aDateTime = new Date(`${a.date}T${a.time || '00:00:00'}`).getTime();
         const bDateTime = new Date(`${b.date}T${b.time || '00:00:00'}`).getTime();
@@ -120,6 +136,7 @@ export default function Home() {
       const examDateTime = new Date(`${e.date}T${e.time || '23:59:59'}`);
       return e.completed || isPast(examDateTime);
     })
+    .filter(e => selectedCategory === 'all' || e.category === selectedCategory)
     .sort((a, b) => {
         const aDateTime = new Date(`${a.date}T${a.time || '00:00:00'}`).getTime();
         const bDateTime = new Date(`${b.date}T${b.time || '00:00:00'}`).getTime();
@@ -159,7 +176,10 @@ export default function Home() {
                     ? "bg-primary/10 text-primary hover:bg-primary/20"
                     : "hover:bg-primary hover:text-primary-foreground"
                 )}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  setActiveTab(item.id)
+                  setSelectedCategory("all")
+                }}
               >
                 <item.icon className="h-4 w-4" />
                 <span className="hidden md:inline">{item.label}</span>
@@ -270,7 +290,21 @@ export default function Home() {
           <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
              <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold">Upcoming Exams</h2>
-                <Badge variant="secondary">{upcomingExams.length} Scheduled</Badge>
+                <div className="flex items-center gap-4">
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Filter by category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map(category => (
+                        <SelectItem key={category} value={category}>
+                          {category === 'all' ? 'All Categories' : category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Badge variant="secondary">{upcomingExams.length} Scheduled</Badge>
+                </div>
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {upcomingExams.map((exam) => (
@@ -306,7 +340,7 @@ export default function Home() {
                               <p><span className="font-semibold">Extra Notes:</span> {exam.notes}</p>
                           </div>
                       )}
-                      <div className="py-4 mt-4 border-t border-border/50 flex justify-center">
+                      <div className="pt-4 mt-4 border-t border-border/50 flex justify-center">
                           <ExamCountdown date={exam.date} time={exam.time} />
                       </div>
                     </CardContent>
@@ -339,7 +373,21 @@ export default function Home() {
           <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">Exam History</h2>
-              <Badge className="bg-accent text-white">{pastExams.length} Completed</Badge>
+              <div className="flex items-center gap-4">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>
+                        {category === 'all' ? 'All Categories' : category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Badge className="bg-accent text-white">{pastExams.length} Completed</Badge>
+              </div>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
                <div className="overflow-x-auto">
@@ -347,6 +395,7 @@ export default function Home() {
                     <thead className="bg-muted/30 border-b border-border">
                       <tr>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Exam Title</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Category</th>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Date</th>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Syllabus</th>
                         <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Score</th>
@@ -358,6 +407,7 @@ export default function Home() {
                       {pastExams.map((exam) => (
                         <tr key={exam.id} className="border-b border-border/50 last:border-none hover:bg-muted/10 transition-colors">
                           <td className="px-6 py-4 font-medium">{exam.subject}</td>
+                          <td className="px-6 py-4 text-muted-foreground text-sm">{exam.category || 'N/A'}</td>
                           <td className="px-6 py-4 text-muted-foreground text-sm">{format(parseISO(exam.date), 'MMM d, yyyy')}</td>
                           <td className="px-6 py-4 text-muted-foreground text-sm max-w-xs truncate">{exam.syllabus || 'N/A'}</td>
                           <td className="px-6 py-4 text-sm font-medium">
@@ -395,7 +445,7 @@ export default function Home() {
                       ))}
                       {pastExams.length === 0 && (
                         <tr>
-                          <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                          <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
                             No past exam records found.
                           </td>
                         </tr>

@@ -10,12 +10,13 @@ import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface AddExamDialogProps {
-  onAdd: (exam: { subject: string; syllabus?: string; date: string; time?: string; notes?: string }) => void;
+  onAdd: (exam: { subject: string; category?: string; syllabus?: string; date: string; time?: string; notes?: string }) => void;
 }
 
 export function AddExamDialog({ onAdd }: AddExamDialogProps) {
   const [open, setOpen] = useState(false);
   const [subject, setSubject] = useState("");
+  const [category, setCategory] = useState("");
   const [syllabus, setSyllabus] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -32,8 +33,9 @@ export function AddExamDialog({ onAdd }: AddExamDialogProps) {
       });
       return;
     }
-    onAdd({ subject, syllabus, date, time, notes });
+    onAdd({ subject, category, syllabus, date, time, notes });
     setSubject("");
+    setCategory("");
     setSyllabus("");
     setDate("");
     setTime("");
@@ -65,6 +67,15 @@ export function AddExamDialog({ onAdd }: AddExamDialogProps) {
               placeholder="e.g. Advanced Mathematics" 
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">Category (Optional)</Label>
+            <Input 
+              id="category" 
+              placeholder="e.g. Mid-term, Final, Quiz" 
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
             />
           </div>
           <div className="space-y-2">

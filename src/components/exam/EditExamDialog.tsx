@@ -19,6 +19,7 @@ interface EditExamDialogProps {
 export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: EditExamDialogProps) {
   const [open, setOpen] = useState(false);
   const [subject, setSubject] = useState(exam.subject);
+  const [category, setCategory] = useState(exam.category || "");
   const [syllabus, setSyllabus] = useState(exam.syllabus || "");
   const [date, setDate] = useState(exam.date);
   const [time, setTime] = useState(exam.time || "");
@@ -35,7 +36,7 @@ export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: Edit
       });
       return;
     }
-    onUpdate(exam.id, { subject, syllabus, date, time, notes });
+    onUpdate(exam.id, { subject, category, syllabus, date, time, notes });
     setOpen(false);
     toast({
       title: "Exam updated",
@@ -73,6 +74,15 @@ export function EditExamDialog({ exam, onUpdate, triggerVariant = "icon" }: Edit
               placeholder="e.g. Advanced Mathematics" 
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">Category (Optional)</Label>
+            <Input 
+              id="category" 
+              placeholder="e.g. Mid-term, Final, Quiz" 
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
             />
           </div>
           <div className="space-y-2">

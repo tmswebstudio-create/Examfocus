@@ -66,6 +66,10 @@
           "type": "string",
           "description": "The subject or title of the exam."
         },
+        "category": {
+          "type": "string",
+          "description": "The category of the exam (e.g., Mid-term, Final)."
+        },
         "syllabus": {
           "type": "string",
           "description": "The syllabus for the exam."

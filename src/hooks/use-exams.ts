@@ -11,6 +11,7 @@ export type Exam = {
   userId: string;
   subject: string;
   syllabus?: string;
+  category?: string;
   date: string; // YYYY-MM-DD
   time?: string;
   notes?: string;
