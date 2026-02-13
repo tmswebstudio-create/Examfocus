@@ -386,7 +386,7 @@ export default function Home() {
                     ))}
                   </SelectContent>
                 </Select>
-                <Badge className="bg-accent text-white">{pastExams.length} Completed</Badge>
+                <Badge className="bg-accent text-white">{pastExams.filter(e => e.completed).length} Completed</Badge>
               </div>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
