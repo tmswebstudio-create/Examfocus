@@ -1,20 +1,21 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, parseISO, isPast } from 'date-fns';
+import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, isPast } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 interface CountdownProps {
   date: string;
+  time?: string | null;
   variant?: 'default' | 'featured';
 }
 
-export function ExamCountdown({ date, variant = 'default' }: CountdownProps) {
+export function ExamCountdown({ date, time, variant = 'default' }: CountdownProps) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [past, setPast] = useState(false);
 
   useEffect(() => {
-    const target = parseISO(date);
+    const target = new Date(`${date}T${time || '23:59:59'}`);
 
     const intervalId = setInterval(() => {
       const now = new Date();
@@ -45,7 +46,7 @@ export function ExamCountdown({ date, variant = 'default' }: CountdownProps) {
     }
 
     return () => clearInterval(intervalId);
-  }, [date]);
+  }, [date, time]);
 
   if (past) {
     return (

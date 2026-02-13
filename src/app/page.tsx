@@ -225,7 +225,7 @@ export default function Home() {
                     </div>
                   )}
                   <div className="pt-4 mt-4 border-t border-white/20 flex justify-center">
-                    <ExamCountdown date={nextExam.date} variant="featured" />
+                    <ExamCountdown date={nextExam.date} time={nextExam.time} variant="featured" />
                   </div>
                 </CardContent>
                 <div className="p-4 bg-black/10 flex items-center justify-between">
@@ -307,7 +307,7 @@ export default function Home() {
                           </div>
                       )}
                       <div className="py-4 mt-4 border-t border-border/50 flex justify-center">
-                          <ExamCountdown date={exam.date} />
+                          <ExamCountdown date={exam.date} time={exam.time} />
                       </div>
                     </CardContent>
                     <div className="p-4 bg-muted/10 flex items-center justify-between">
