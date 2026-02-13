@@ -157,12 +157,12 @@ export default function Home() {
       {/* Sticky Top Navigation */}
       <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-md px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <a href="https://examfocus.vercel.app/" className="flex items-center gap-2">
             <div className="bg-primary p-2 rounded-lg">
               <LayoutDashboard className="text-white h-5 w-5" />
             </div>
             <span className="text-xl font-bold tracking-tight text-primary hidden sm:inline-block">ExamFocus</span>
-          </div>
+          </a>
 
           <div className="flex items-center gap-1 md:gap-4">
             {navItems.map((item) => (
@@ -341,7 +341,7 @@ export default function Home() {
                           </div>
                       )}
                       <div className="mt-4 flex justify-center">
-                          <ExamCountdown date={exam.date} time={exam.time} />
+                          <ExamCountdown date={exam.date} time={exam.time} variant="default" />
                       </div>
                     </CardContent>
                     <div className="p-4 bg-muted/10 flex items-center justify-between">
